@@ -289,6 +289,45 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                     openPage('/our-story');
                   },
                 ),
+
+                // =================================================
+                // ROOMS - GROUP MEMBER
+                // =================================================
+
+                serviceCard(
+                  icon: Icons.hotel_outlined,
+                  title: 'Rooms',
+                  subtitle: 'Explore Our Rooms',
+                  onTap: () {
+                    openPage('/rooms');
+                  },
+                ),
+
+                // =================================================
+                // BANQUET HALLS - GROUP MEMBER
+                // =================================================
+
+                serviceCard(
+                  icon: Icons.event_outlined,
+                  title: 'Banquet Halls',
+                  subtitle: 'Events & Celebrations',
+                  onTap: () {
+                    openPage('/banquet-halls');
+                  },
+                ),
+
+                // =================================================
+                // SPECIAL OFFERS - GROUP MEMBER
+                // =================================================
+
+                serviceCard(
+                  icon: Icons.local_offer_outlined,
+                  title: 'Special Offers',
+                  subtitle: 'Exclusive Deals',
+                  onTap: () {
+                    openPage('/special-offers');
+                  },
+                ),
               ],
             ),
 
@@ -578,3 +617,4 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
     );
   }
 }
+      
