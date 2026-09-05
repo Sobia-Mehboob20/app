@@ -1,22 +1,23 @@
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'manager_dashboard.dart';
+
 class Signin extends StatefulWidget {
-   final String role;
-  const Signin({super.key ,
-    required this.role,});
+  final String role;
+
+  const Signin({
+    super.key,
+    required this.role,
+  });
 
   @override
   State<Signin> createState() => _SigninState();
 }
 
 class _SigninState extends State<Signin> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController name = TextEditingController();
@@ -25,6 +26,83 @@ class _SigninState extends State<Signin> {
   final TextEditingController confirmpassword = TextEditingController();
 
   bool _obscurePassword = true;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    name.dispose();
+    email.dispose();
+    password.dispose();
+    confirmpassword.dispose();
+    super.dispose();
+  }
+
+  Future<void> createAccount() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email.text.trim(),
+        password: password.text.trim(),
+      );
+
+      String uid = userCredential.user!.uid;
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .set({
+        'name': name.text.trim(),
+        'email': email.text.trim(),
+        'role': widget.role,
+      });
+
+      print("Account Created");
+      print("Role: ${widget.role}");
+
+      if (!mounted) return;
+
+      // Manager → Manager Dashboard
+      if (widget.role == "Manager") {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ManagerDashboard(),
+          ),
+          (route) => false,
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message ?? "Account creation failed."),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error: $e"),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,15 +123,21 @@ class _SigninState extends State<Signin> {
                   const Text(
                     "Welcome Here",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
 
                   const SizedBox(height: 10),
 
-                  const Text(
-                    "Create a new account!",
+                  Text(
+                    "Create a ${widget.role} account",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
                   ),
 
                   const SizedBox(height: 35),
@@ -69,7 +153,6 @@ class _SigninState extends State<Signin> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return "Please enter your name";
@@ -89,7 +172,6 @@ class _SigninState extends State<Signin> {
                   TextFormField(
                     controller: email,
                     keyboardType: TextInputType.emailAddress,
-
                     decoration: InputDecoration(
                       labelText: "Email",
                       hintText: "Enter your email",
@@ -98,15 +180,13 @@ class _SigninState extends State<Signin> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return "Please enter your email";
                       }
 
-                      final emailPattern = RegExp(
-                        r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
-                      );
+                      final emailPattern =
+                          RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
                       if (!emailPattern.hasMatch(value.trim())) {
                         return "Please enter a valid email";
@@ -122,7 +202,6 @@ class _SigninState extends State<Signin> {
                   TextFormField(
                     controller: password,
                     obscureText: _obscurePassword,
-
                     decoration: InputDecoration(
                       labelText: "Password",
                       hintText: "Enter your password",
@@ -134,7 +213,6 @@ class _SigninState extends State<Signin> {
                               ? Icons.visibility_off
                               : Icons.visibility,
                         ),
-
                         onPressed: () {
                           setState(() {
                             _obscurePassword = !_obscurePassword;
@@ -146,7 +224,6 @@ class _SigninState extends State<Signin> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "Please enter your password";
@@ -162,25 +239,25 @@ class _SigninState extends State<Signin> {
 
                   const SizedBox(height: 18),
 
-
+                  // CONFIRM PASSWORD
                   TextFormField(
                     controller: confirmpassword,
                     obscureText: true,
                     decoration: InputDecoration(
-                      labelText: 'Confirm Password',
-                      hintText: 'Re-enter your password',
-                      prefixIcon: Icon(Icons.lock_outline),
+                      labelText: "Confirm Password",
+                      hintText: "Re-enter your password",
+                      prefixIcon: const Icon(Icons.lock_outline),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please confirm your password';
+                        return "Please confirm your password";
                       }
 
-                      if (value !=password.text) {
-                        return 'Passwords do not match';
+                      if (value != password.text) {
+                        return "Passwords do not match";
                       }
 
                       return null;
@@ -189,48 +266,37 @@ class _SigninState extends State<Signin> {
 
                   const SizedBox(height: 25),
 
-                  // LOGIN BUTTON
+                  // SIGN UP BUTTON
                   SizedBox(
-  height: 52,
-  child: ElevatedButton(
-    onPressed: () async {
-      if (_formKey.currentState!.validate()) {
-        try {
-          UserCredential userCredential =
-              await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: email.text.trim(),
-            password: password.text.trim(),
-          );
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : createAccount,
 
-          String uid = userCredential.user!.uid;
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3F4A32),
+                        foregroundColor: const Color(0xFFF5F0E8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
 
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(uid)
-              .set({
-            'name': name.text.trim(),
-            'email': email.text.trim(),
-            'role': widget.role,
-          });
-
-          print("Account Created");
-          print("Role: ${widget.role}");
-        } on FirebaseAuthException catch (e) {
-          print(e.message);
-        }
-      }
-    
-    },
-    child: const Text(
-      "Sign Up",
-      style: TextStyle(
-        fontSize: 17,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  ),
-),
-               
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              "Sign Up",
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
                 ],
               ),
             ),

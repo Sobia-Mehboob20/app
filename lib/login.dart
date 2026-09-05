@@ -1,13 +1,19 @@
 
-import 'package:app/role.dart';
+import 'package:app/receptionist.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'manager_dashboard.dart';
+import 'sigin.dart';
+
 class Login extends StatefulWidget {
-   final String role;
-  const Login({super.key,
-   required this.role,});
+  final String role;
+
+  const Login({
+    super.key,
+    required this.role,
+  });
 
   @override
   State<Login> createState() => _LoginState();
@@ -21,6 +27,114 @@ class _LoginState extends State<Login> {
   final TextEditingController passwordController = TextEditingController();
 
   bool _obscurePassword = true;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> loginUser() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      String uid = userCredential.user!.uid;
+
+      DocumentSnapshot userData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+
+      if (!userData.exists) {
+        throw Exception("User data not found.");
+      }
+
+      String role = userData['role'];
+
+      print("Login Successful");
+      print("Role: $role");
+
+      if (!mounted) return;
+
+      if (role.toLowerCase() == widget.role.toLowerCase()) {
+  if (widget.role == "Manager") {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ManagerDashboard(),
+      )
+      
+    );}
+  
+ else if (widget.role == "Receptionist")
+    {
+    
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ReceptionistDashboard(),
+      ),
+      );
+    } }
+
+ else {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("You are not authorized for this role."),
+    ),
+  );
+} 
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      String message = "Login failed.";
+
+      if (e.code == 'user-not-found') {
+        message = "No account found with this email.";
+      } else if (e.code == 'wrong-password') {
+        message = "Incorrect password.";
+      } else if (e.code == 'invalid-credential') {
+        message = "Invalid email or password.No user exist with this email and pasword";
+      } else if (e.code == 'invalid-email') {
+        message = "Invalid email address.";
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error: $e"),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +152,6 @@ class _LoginState extends State<Login> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-
                   const Text(
                     "Welcome Back",
                     textAlign: TextAlign.center,
@@ -50,10 +163,10 @@ class _LoginState extends State<Login> {
 
                   const SizedBox(height: 10),
 
-                  const Text(
-                    "Login to your account",
+                  Text(
+                    "Login as ${widget.role}",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       color: Colors.grey,
                     ),
@@ -72,7 +185,6 @@ class _LoginState extends State<Login> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return "Please enter your name";
@@ -136,7 +248,6 @@ class _LoginState extends State<Login> {
                               ? Icons.visibility_off
                               : Icons.visibility,
                         ),
-
                         onPressed: () {
                           setState(() {
                             _obscurePassword = !_obscurePassword;
@@ -168,60 +279,47 @@ class _LoginState extends State<Login> {
                   SizedBox(
                     height: 52,
 
-                    child:ElevatedButton(
-  onPressed: () async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        UserCredential userCredential =
-            await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim(),
-        );
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : loginUser,
 
-        String uid = userCredential.user!.uid;
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3F4A32),
+                        foregroundColor: const Color(0xFFF5F0E8),
 
-        DocumentSnapshot userData =
-            await FirebaseFirestore.instance
-                .collection('users')
-                .doc(uid)
-                .get();
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
 
-        String role = userData['role'];
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              "Login",
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
 
-        print("Login Successful");
-        print("Role: $role");
+                  const SizedBox(height: 15),
 
-      } on FirebaseAuthException catch (e) {
-        print(e.message);
-      }
-    }
-  },
-
-  style: ElevatedButton.styleFrom(
-    backgroundColor: const Color(0xFF3F4A32),
-    foregroundColor: const Color(0xFFF5F0E8),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
-  ),
-
-  child: const Text(
-    "Login",
-    style: TextStyle(
-      fontSize: 17,
-      fontWeight: FontWeight.bold,
-    ),
-  ),
-),
-
-                      )
-                  ],),
-          
+                  // SIGN UP
+                 
+                ],
               ),
             ),
           ),
         ),
-      );
-
- }
+      ),
+    );
   }
+}
+

@@ -1,9 +1,14 @@
+
+import 'package:app/login.dart';
+import 'package:app/loginScreen.dart';
 import 'package:flutter/material.dart';
-import 'loginScreen.dart';
-import 'login.dart';
+import 'manager_dashboard.dart';
 
 class Role extends StatefulWidget {
-  const Role({super.key});
+    //final String role;
+  const Role({super.key,
+  //required this.role,
+  });
 
   @override
   State<Role> createState() => _RoleState();
@@ -57,7 +62,7 @@ class _RoleState extends State<Role> {
                   roleTile(
                     index: 0,
                     icon: Icons.admin_panel_settings_outlined,
-                    title: "Admin",
+                    title: "Manager",
                     subtitle: "Full access to all modules",
                   ),
 
@@ -72,12 +77,12 @@ class _RoleState extends State<Role> {
 
                   const SizedBox(height: 15),
 
-                  roleTile(
+                 /* roleTile(
                     index: 2,
                     icon: Icons.restaurant_outlined,
                     title: "Owner",
                     subtitle: "Manage your restaurant",
-                  ),
+                  ),*/
 
                   const SizedBox(height: 15),
 
@@ -137,19 +142,45 @@ class _RoleState extends State<Role> {
           ],
         ),
         child: ListTile(
-          onTap: ()
-          {
-            Navigator.push(context,MaterialPageRoute(builder:(context)=>Loginscreen(role:title,),
-            
-            ),
-              );
-                
-          },
+         onTap: () {
+  if (title == "Customer") {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>  Loginscreen(role:title),
+      ),
+    );
+  } 
+  else if (title == "Manager") {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>  Login(role: title),
+      ),
+    );
+  } 
+
+  else if (title == "Receptionist") {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Login(role: title),
+      ),
+    );
+  } 
+  /*else if (title == "Owner") {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>Login(role:title),
+      ),
+    );
+  }*/
+},
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
             vertical: 8,
           ),
-
           leading: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -166,7 +197,6 @@ class _RoleState extends State<Role> {
                   : const Color(0xFF3F4A32),
             ),
           ),
-
           title: Text(
             title,
             style: TextStyle(
@@ -177,7 +207,6 @@ class _RoleState extends State<Role> {
                   : const Color(0xFF222222),
             ),
           ),
-
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text(
@@ -189,10 +218,10 @@ class _RoleState extends State<Role> {
                     : Colors.grey.shade600,
               ),
             ),
-          )
           ),
         ),
-      );
-    //);
+      ),
+    );
   }
 }
+
