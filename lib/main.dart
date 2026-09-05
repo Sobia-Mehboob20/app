@@ -1,9 +1,5 @@
 import 'dart:async';
-import 'package:app/amenities.dart';
 import 'package:app/loginScreen.dart';
-import 'package:app/sigin.dart';
-import 'package:app/payment.dart';
-import 'package:app/amenities.dart';
 import 'package:app/role.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -45,7 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Timer(const Duration(seconds: 1), () {
       // Next screen par navigation yahan karna hai
-      Navigator.push(context,MaterialPageRoute(builder:(context)=> const PaymentScreen()),);
+      Navigator.push(context,MaterialPageRoute(builder:(context)=> const Role()),);
     });
   }
 

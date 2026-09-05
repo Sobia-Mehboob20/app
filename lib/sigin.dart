@@ -1,8 +1,11 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Signin extends StatefulWidget {
-  const Signin({super.key});
+   final String role;
+  const Signin({super.key ,
+    required this.role,});
 
   @override
   State<Signin> createState() => _SigninState();
@@ -176,7 +179,7 @@ class _SigninState extends State<Signin> {
                         return 'Please confirm your password';
                       }
 
-                      if (value != confirmpassword.text) {
+                      if (value !=password.text) {
                         return 'Passwords do not match';
                       }
 
@@ -188,39 +191,46 @@ class _SigninState extends State<Signin> {
 
                   // LOGIN BUTTON
                   SizedBox(
-                    height: 52,
+  height: 52,
+  child: ElevatedButton(
+    onPressed: () async {
+      if (_formKey.currentState!.validate()) {
+        try {
+          UserCredential userCredential =
+              await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: email.text.trim(),
+            password: password.text.trim(),
+          );
 
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          // All validation passed
-                          print("Login Successful");
+          String uid = userCredential.user!.uid;
 
-                          print("Name: ${name.text}");
-                          print("Email: ${email.text}");
-                          print("Password: ${password.text}");
-                          print("Password: ${confirmpassword.text}");
-                        }
-                      },
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(uid)
+              .set({
+            'name': name.text.trim(),
+            'email': email.text.trim(),
+            'role': widget.role,
+          });
 
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:Color(0xFF3F4A32) ,
-                        foregroundColor:  Color(0xFFF5F0E8),
-
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-
-                      child: const Text(
-                        "Sigup",
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
+          print("Account Created");
+          print("Role: ${widget.role}");
+        } on FirebaseAuthException catch (e) {
+          print(e.message);
+        }
+      }
+    
+    },
+    child: const Text(
+      "Sign Up",
+      style: TextStyle(
+        fontSize: 17,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  ),
+),
+               
                 ],
               ),
             ),

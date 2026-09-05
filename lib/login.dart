@@ -1,9 +1,13 @@
 
 import 'package:app/role.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Login extends StatefulWidget {
-  const Login({super.key});
+   final String role;
+  const Login({super.key,
+   required this.role,});
 
   @override
   State<Login> createState() => _LoginState();
@@ -164,43 +168,51 @@ class _LoginState extends State<Login> {
                   SizedBox(
                     height: 52,
 
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
+                    child:ElevatedButton(
+  onPressed: () async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        );
 
-                          // All validation passed
-                          print("Login Successful");
+        String uid = userCredential.user!.uid;
 
-                          print("Name: ${nameController.text}");
-                          print("Email: ${emailController.text}");
-                          print("Password: ${passwordController.text}");
-                      
-                      
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const Role()  )  );
-                        };
-                      },
+        DocumentSnapshot userData =
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(uid)
+                .get();
 
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:Color(0xFF3F4A32) ,
-                        foregroundColor:  Color(0xFFF5F0E8),
+        String role = userData['role'];
 
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                         ),
+        print("Login Successful");
+        print("Role: $role");
 
-                      child: const Text(
-                        "Login",
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                     
-                     )
-                     )
+      } on FirebaseAuthException catch (e) {
+        print(e.message);
+      }
+    }
+  },
+
+  style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xFF3F4A32),
+    foregroundColor: const Color(0xFFF5F0E8),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+  ),
+
+  child: const Text(
+    "Login",
+    style: TextStyle(
+      fontSize: 17,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+),
 
                       )
                   ],),
