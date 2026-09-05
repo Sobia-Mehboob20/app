@@ -1,10 +1,16 @@
 import 'dart:async';
+
 import 'package:app/loginScreen.dart';
 import 'package:app/role.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'firebase_options.dart';
+import 'roomscreen.dart';
+import 'banquet_halls_screen.dart';
+import 'special_offers_screen.dart';
+import 'manager_dashboard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,17 +19,24 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+  runApp(const AureliaGrandApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class AureliaGrandApp extends StatelessWidget {
+  const AureliaGrandApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Hotel App',
+      title: 'Aurelia Grand',
+      theme: ThemeData(
+        useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xFFF5F0E8),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF5A6545),
+        ),
+      ),
       home: const SplashScreen(),
     );
   }
@@ -80,8 +93,145 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-class RoomsScreen extends StatelessWidget {
-  const RoomsScreen({super.key});
+class TemporaryHomeScreen extends StatelessWidget {
+  const TemporaryHomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F0E8),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF5F0E8),
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Aurelia Grand',
+          style: TextStyle(
+            color: Color(0xFF3F4A32),
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Aurelia Grand',
+                style: TextStyle(
+                  color: Color(0xFF3F4A32),
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Hotel • Events • Dining • Wellness',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 15,
+                ),
+              ),
+              const SizedBox(height: 35),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RoomsScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.hotel),
+                  label: const Text(
+                    'Rooms',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3F4A32),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 15),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BanquetHallsScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.celebration),
+                  label: const Text(
+                    'Banquet Halls',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3F4A32),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 15),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SpecialOffersScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.local_offer),
+                  label: const Text(
+                    'Special Offers',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3F4A32),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class RoomScreen extends StatelessWidget {
+  const RoomScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
