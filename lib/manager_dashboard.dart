@@ -40,18 +40,12 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
       body: IndexedStack(
         index: _selectedIndex,
-        children: [
-          _homePage(),
-          _bookingsPage(),
-          _messagesPage(),
-          _morePage(),
-        ],
+        children: [_homePage(), _bookingsPage(), _messagesPage(), _morePage()],
       ),
 
       // =====================================================
       // BOTTOM NAVIGATION
       // =====================================================
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onBottomNavTap,
@@ -110,26 +104,18 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
             pinned: true,
             expandedHeight: 80,
 
- iconTheme: const IconThemeData(
-          color: Color(0xFFF5F0E8),
- ),
+            iconTheme: const IconThemeData(color: Color(0xFFF5F0E8)),
             title: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Aurelia Grand',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
                 ),
 
                 Text(
                   'Good Morning Manager',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ],
             ),
@@ -138,25 +124,17 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
               IconButton(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('No new notifications'),
-                    ),
+                    const SnackBar(content: Text('No new notifications')),
                   );
                 },
-                icon: const Icon(
-                  Icons.notifications_none,
-                  color: Colors.white,
-                ),
+                icon: const Icon(Icons.notifications_none, color: Colors.white),
               ),
 
               const Padding(
                 padding: EdgeInsets.only(right: 12),
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
-                  child: Icon(
-                    Icons.person,
-                    color: green,
-                  ),
+                  child: Icon(Icons.person, color: green),
                 ),
               ),
             ],
@@ -165,7 +143,6 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
           // -------------------------------------------------
           // HOTEL IMAGE
           // -------------------------------------------------
-
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -224,10 +201,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                         children: [
                           Text(
                             'Aurelia Grand',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                            ),
+                            style: TextStyle(color: Colors.white, fontSize: 22),
                           ),
 
                           SizedBox(height: 4),
@@ -251,7 +225,6 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
           // -------------------------------------------------
           // WELCOME CARD
           // -------------------------------------------------
-
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
@@ -272,20 +245,14 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                   children: [
                     Text(
                       'Manage. Operate. Grow.',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 21,
-                      ),
+                      style: TextStyle(color: Colors.white, fontSize: 21),
                     ),
 
                     SizedBox(height: 8),
 
                     Text(
                       'Manage customers, bookings, payments and reports from one place.',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 13,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 13),
                     ),
                   ],
                 ),
@@ -296,17 +263,13 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
           // -------------------------------------------------
           // MANAGEMENT TITLE
           // -------------------------------------------------
-
           const SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.fromLTRB(16, 25, 16, 14),
 
               child: Text(
                 'Manager Services',
-                style: TextStyle(
-                  fontSize: 21,
-                  color: green,
-                ),
+                style: TextStyle(fontSize: 21, color: green),
               ),
             ),
           ),
@@ -314,7 +277,6 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
           // =================================================
           // MANAGER CARDS
           // =================================================
-
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
 
@@ -327,7 +289,6 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
               childAspectRatio: 1.15,
 
               children: [
-
                 // =================================================
                 // CUSTOMERS
                 // =================================================
@@ -341,8 +302,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                       context,
 
                       MaterialPageRoute(
-                        builder: (context) =>
-                            const CustomersScreen(),
+                        builder: (context) => const CustomersScreen(),
                       ),
                     );
                   },
@@ -351,7 +311,6 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                 // =================================================
                 // BOOKINGS
                 // =================================================
-
                 _dashboardCard(
                   icon: Icons.calendar_month_outlined,
                   title: 'Bookings',
@@ -361,8 +320,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                       context,
 
                       MaterialPageRoute(
-                        builder: (context) =>
-                            const ManagerBookingsScreen(),
+                        builder: (context) => const ManagerBookingsScreen(),
                       ),
                     );
                   },
@@ -371,7 +329,6 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                 // =================================================
                 // PAYMENTS
                 // =================================================
-
                 _dashboardCard(
                   icon: Icons.payment_outlined,
                   title: 'Payments',
@@ -381,8 +338,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                       context,
 
                       MaterialPageRoute(
-                        builder: (context) =>
-                            const ManagerPaymentsScreen(),
+                        builder: (context) => const ManagerPaymentsScreen(),
                       ),
                     );
                   },
@@ -391,7 +347,6 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                 // =================================================
                 // MESSAGES
                 // =================================================
-
                 _dashboardCard(
                   icon: Icons.chat_bubble_outline,
                   title: 'Messages',
@@ -406,7 +361,6 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                 // =================================================
                 // REPORTS
                 // =================================================
-
                 _dashboardCard(
                   icon: Icons.bar_chart_outlined,
                   title: 'Reports',
@@ -416,8 +370,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                       context,
 
                       MaterialPageRoute(
-                        builder: (context) =>
-                            const ManagerReportsScreen(),
+                        builder: (context) => const ManagerReportsScreen(),
                       ),
                     );
                   },
@@ -426,9 +379,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
             ),
           ),
 
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 30),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 30)),
         ],
       ),
     );
@@ -448,9 +399,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
       elevation: 2,
 
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
 
       child: InkWell(
         borderRadius: BorderRadius.circular(15),
@@ -461,11 +410,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
           mainAxisAlignment: MainAxisAlignment.center,
 
           children: [
-            Icon(
-              icon,
-              size: 35,
-              color: green,
-            ),
+            Icon(icon, size: 35, color: green),
 
             const SizedBox(height: 10),
 
@@ -474,10 +419,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
               textAlign: TextAlign.center,
 
-              style: const TextStyle(
-                fontSize: 14,
-                color: green,
-              ),
+              style: const TextStyle(fontSize: 14, color: green),
             ),
           ],
         ),
@@ -503,21 +445,29 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
         backgroundColor: background,
 
         appBar: AppBar(
-          backgroundColor: green,
-          elevation: 0,
+  backgroundColor: green,
+  elevation: 0,
 
-          title: const Text(
-            'Messages',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 19,
-            ),
-          ),
-           iconTheme: const IconThemeData(
-          color: Color(0xFFF5F0E8),
-        ),
-        ),
+  leading: IconButton(
+    icon: const Icon(
+      Icons.arrow_back,
+      color: Color(0xFFF5F0E8),
+    ),
+    onPressed: () {
+      setState(() {
+        _selectedIndex = 0;
+      });
+    },
+  ),
 
+  title: const Text(
+    'Messages',
+    style: TextStyle(
+      color: Colors.white,
+      fontSize: 19,
+    ),
+  ),
+),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(25),
@@ -537,10 +487,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                 const Text(
                   'No Messages Available',
 
-                  style: TextStyle(
-                    fontSize: 19,
-                    color: green,
-                  ),
+                  style: TextStyle(fontSize: 19, color: green),
                 ),
 
                 const SizedBox(height: 8),
@@ -551,10 +498,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
                   textAlign: TextAlign.center,
 
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.black54,
-                  ),
+                  style: TextStyle(fontSize: 13, color: Colors.black54),
                 ),
               ],
             ),
@@ -574,27 +518,34 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
         backgroundColor: background,
 
         appBar: AppBar(
-          backgroundColor: green,
-          elevation: 0,
+  backgroundColor: green,
+  elevation: 0,
 
-          title: const Text(
-            'More',
+  leading: IconButton(
+    icon: const Icon(
+      Icons.arrow_back,
+      color: Color(0xFFF5F0E8),
+    ),
+    onPressed: () {
+      setState(() {
+        _selectedIndex = 0;
+      });
+    },
+  ),
 
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 19,
-            ),
-          ),
-           iconTheme: const IconThemeData(
-          color: Color(0xFFF5F0E8),
-        ),
-        ),
+  title: const Text(
+    'More',
+    style: TextStyle(
+      color: Colors.white,
+      fontSize: 19,
+    ),
+  ),
+),
 
         body: ListView(
           padding: const EdgeInsets.all(16),
 
           children: [
-
             _moreTile(
               icon: Icons.people_outline,
               title: 'Manage Customers',
@@ -604,8 +555,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                   context,
 
                   MaterialPageRoute(
-                    builder: (context) =>
-                        const CustomersScreen(),
+                    builder: (context) => const CustomersScreen(),
                   ),
                 );
               },
@@ -620,8 +570,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                   context,
 
                   MaterialPageRoute(
-                    builder: (context) =>
-                        const ManagerBookingsScreen(),
+                    builder: (context) => const ManagerBookingsScreen(),
                   ),
                 );
               },
@@ -636,8 +585,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                   context,
 
                   MaterialPageRoute(
-                    builder: (context) =>
-                        const ManagerPaymentsScreen(),
+                    builder: (context) => const ManagerPaymentsScreen(),
                   ),
                 );
               },
@@ -652,8 +600,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                   context,
 
                   MaterialPageRoute(
-                    builder: (context) =>
-                        const ManagerReportsScreen(),
+                    builder: (context) => const ManagerReportsScreen(),
                   ),
                 );
               },
@@ -666,9 +613,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text(
-                      'Settings will be connected later.',
-                    ),
+                    content: Text('Settings will be connected later.'),
                   ),
                 );
               },
@@ -695,32 +640,16 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
       margin: const EdgeInsets.only(bottom: 10),
 
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(13),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
 
       child: ListTile(
         onTap: onTap,
 
-        leading: Icon(
-          icon,
-          color: green,
-        ),
+        leading: Icon(icon, color: green),
 
-        title: Text(
-          title,
+        title: Text(title, style: const TextStyle(color: green, fontSize: 14)),
 
-          style: const TextStyle(
-            color: green,
-            fontSize: 14,
-          ),
-        ),
-
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          size: 15,
-          color: green,
-        ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 15, color: green),
       ),
     );
   }
