@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class HallBookingDetails extends StatelessWidget {
   const HallBookingDetails({super.key});
 
-  // Safe date formatter
   String formatDate(dynamic value) {
     if (value == null) {
       return '-';
@@ -19,7 +18,6 @@ class HallBookingDetails extends StatelessWidget {
       return '${value.day}/${value.month}/${value.year}';
     }
 
-    // If date is saved as String
     return value.toString();
   }
 
@@ -30,26 +28,22 @@ class HallBookingDetails extends StatelessWidget {
 
       appBar: AppBar(
         backgroundColor: const Color(0xFF3F4A32),
+        foregroundColor: Colors.white,
         title: const Text(
           'Hall Booking Details',
           style: TextStyle(
-            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
-        ),
-        iconTheme: const IconThemeData(
-          color: Colors.white,
         ),
       ),
 
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('hallBookings')
+            .collection('bookings')
             .snapshots(),
 
         builder: (context, snapshot) {
-          if (snapshot.connectionState ==
-              ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
@@ -64,17 +58,30 @@ class HallBookingDetails extends StatelessWidget {
             );
           }
 
-          if (!snapshot.hasData ||
-              snapshot.data!.docs.isEmpty) {
+          if (!snapshot.hasData) {
             return const Center(
-              child: Text(
-                'No hall bookings found',
-                style: TextStyle(fontSize: 18),
-              ),
+              child: Text('No bookings found'),
             );
           }
 
-          final bookings = snapshot.data!.docs;
+          // Sirf Event/Hall bookings show hongi
+          final bookings = snapshot.data!.docs.where((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+
+            return data['bookingType'] == 'Event';
+          }).toList();
+
+          if (bookings.isEmpty) {
+            return const Center(
+              child: Text(
+                'No hall bookings found',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            );
+          }
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
@@ -87,11 +94,12 @@ class HallBookingDetails extends StatelessWidget {
                   booking.data() as Map<String, dynamic>;
 
               final status =
-                  data['status']?.toString() ?? 'Pending';
+                  data['bookingStatus']?.toString() ?? 'Pending';
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 16),
                 color: const Color(0xFFFAF8F3),
+                elevation: 4,
 
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
@@ -101,12 +109,11 @@ class HallBookingDetails extends StatelessWidget {
                   padding: const EdgeInsets.all(18),
 
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
 
-                      // Hall Name
+                      // HALL NAME
                       Text(
                         data['hallName']?.toString() ?? 'Hall',
                         style: const TextStyle(
@@ -152,11 +159,25 @@ class HallBookingDetails extends StatelessWidget {
                         'Decoration: ${data['decoration'] ?? '-'}',
                       ),
 
+                      const SizedBox(height: 7),
+
+                      Text(
+                        'Stage: ${data['stageRequired'] == true ? 'Required' : 'Not Required'}',
+                      ),
+
+                      const SizedBox(height: 7),
+
+                      Text(
+                        'Sound System: ${data['soundSystemRequired'] == true ? 'Required' : 'Not Required'}',
+                      ),
+
                       const SizedBox(height: 15),
 
                       const Divider(),
 
                       const SizedBox(height: 10),
+
+                      // PRICE DETAILS
 
                       Text(
                         'Hall Price: PKR ${data['hallPrice'] ?? 0}',
@@ -165,22 +186,19 @@ class HallBookingDetails extends StatelessWidget {
                       const SizedBox(height: 7),
 
                       Text(
-                        'Decoration Price: PKR '
-                        '${data['decorationPrice'] ?? 0}',
+                        'Decoration Price: PKR ${data['decorationPrice'] ?? 0}',
                       ),
 
                       const SizedBox(height: 7),
 
                       Text(
-                        'Stage Price: PKR '
-                        '${data['stagePrice'] ?? 0}',
+                        'Stage Price: PKR ${data['stagePrice'] ?? 0}',
                       ),
 
                       const SizedBox(height: 7),
 
                       Text(
-                        'Sound Price: PKR '
-                        '${data['soundPrice'] ?? 0}',
+                        'Sound Price: PKR ${data['soundPrice'] ?? 0}',
                       ),
 
                       const SizedBox(height: 12),
@@ -190,8 +208,7 @@ class HallBookingDetails extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       Text(
-                        'Total Price: PKR '
-                        '${data['totalPrice'] ?? 0}',
+                        'Total Price: PKR ${data['totalAmount'] ?? 0}',
                         style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
@@ -199,22 +216,24 @@ class HallBookingDetails extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 15),
 
-                      // Status
+                      // STATUS
+
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
-                          vertical: 7,
+                          vertical: 8,
                         ),
 
                         decoration: BoxDecoration(
                           color: status == 'Confirmed'
                               ? Colors.green.shade100
-                              : Colors.orange.shade100,
+                              : status == 'Rejected'
+                                  ? Colors.red.shade100
+                                  : Colors.orange.shade100,
 
-                          borderRadius:
-                              BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20),
                         ),
 
                         child: Text(
@@ -222,15 +241,18 @@ class HallBookingDetails extends StatelessWidget {
                           style: TextStyle(
                             color: status == 'Confirmed'
                                 ? Colors.green.shade800
-                                : Colors.orange.shade800,
+                                : status == 'Rejected'
+                                    ? Colors.red.shade800
+                                    : Colors.orange.shade800,
 
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
 
-                      // Confirm Button
-                      if (status != 'Confirmed') ...[
+                      // CONFIRM BUTTON
+
+                      if (status == 'Pending') ...[
                         const SizedBox(height: 15),
 
                         SizedBox(
@@ -239,12 +261,11 @@ class HallBookingDetails extends StatelessWidget {
                           child: ElevatedButton.icon(
                             onPressed: () async {
                               try {
-                                await FirebaseFirestore
-                                    .instance
-                                    .collection('hallBookings')
+                                await FirebaseFirestore.instance
+                                    .collection('bookings')
                                     .doc(booking.id)
                                     .update({
-                                  'status': 'Confirmed',
+                                  'bookingStatus': 'Confirmed',
                                 });
 
                                 if (context.mounted) {
@@ -286,13 +307,11 @@ class HallBookingDetails extends StatelessWidget {
 
                               foregroundColor: Colors.white,
 
-                              padding:
-                                  const EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 vertical: 12,
                               ),
 
-                              shape:
-                                  RoundedRectangleBorder(
+                              shape: RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.circular(10),
                               ),
