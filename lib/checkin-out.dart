@@ -26,6 +26,10 @@ class CheckInOutDetails extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('roomBookings')
+            .where(
+              'checkOut',
+              isGreaterThanOrEqualTo: Timestamp.now(),
+            )
             .snapshots(),
 
         builder: (context, snapshot) {
@@ -45,8 +49,9 @@ class CheckInOutDetails extends StatelessWidget {
               snapshot.data!.docs.isEmpty) {
             return const Center(
               child: Text(
-                'No check-in / check-out records found',
+                'No current check-in / check-out records found',
                 style: TextStyle(fontSize: 18),
+                textAlign: TextAlign.center,
               ),
             );
           }
@@ -58,9 +63,12 @@ class CheckInOutDetails extends StatelessWidget {
             itemCount: bookings.length,
 
             itemBuilder: (context, index) {
+              final booking = bookings[index];
+
               final data =
-                  bookings[index].data()
-                      as Map<String, dynamic>;
+                  booking.data() as Map<String, dynamic>;
+
+              final status = data['status'] ?? '-';
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -123,9 +131,11 @@ class CheckInOutDetails extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       Text(
-                        'Status: ${data['status'] ?? '-'}',
-                        style: const TextStyle(
-                          color: Colors.green,
+                        'Status: $status',
+                        style: TextStyle(
+                          color: status == 'Confirmed'
+                              ? Colors.green
+                              : Colors.orange,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

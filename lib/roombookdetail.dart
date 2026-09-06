@@ -9,6 +9,34 @@ class RoomBookingDetails extends StatelessWidget {
     return '${date.day}/${date.month}/${date.year}';
   }
 
+  Future<void> confirmBooking(
+    BuildContext context,
+    String bookingId,
+  ) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('roomBookings')
+          .doc(bookingId)
+          .update({
+        'status': 'Confirmed',
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Room booking confirmed successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error confirming booking: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,9 +86,12 @@ class RoomBookingDetails extends StatelessWidget {
             itemCount: bookings.length,
 
             itemBuilder: (context, index) {
+              final booking = bookings[index];
+
               final data =
-                  bookings[index].data()
-                      as Map<String, dynamic>;
+                  booking.data() as Map<String, dynamic>;
+
+              final status = data['status'] ?? '-';
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -126,12 +157,49 @@ class RoomBookingDetails extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       Text(
-                        'Status: ${data['status'] ?? '-'}',
-                        style: const TextStyle(
-                          color: Colors.green,
+                        'Status: $status',
+                        style: TextStyle(
+                          color: status == 'Confirmed'
+                              ? Colors.green
+                              : Colors.orange,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+
+                      const SizedBox(height: 15),
+
+                      if (status != 'Confirmed')
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              confirmBooking(
+                                context,
+                                booking.id,
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color(0xFF3F4A32),
+                              foregroundColor: Colors.white,
+                              padding:
+                                  const EdgeInsets.symmetric(
+                                vertical: 13,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: const Text(
+                              'Confirm Booking',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),

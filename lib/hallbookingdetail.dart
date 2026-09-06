@@ -81,9 +81,13 @@ class HallBookingDetails extends StatelessWidget {
             itemCount: bookings.length,
 
             itemBuilder: (context, index) {
+              final booking = bookings[index];
+
               final data =
-                  bookings[index].data()
-                      as Map<String, dynamic>;
+                  booking.data() as Map<String, dynamic>;
+
+              final status =
+                  data['status']?.toString() ?? 'Pending';
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -197,6 +201,7 @@ class HallBookingDetails extends StatelessWidget {
 
                       const SizedBox(height: 12),
 
+                      // Status
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -204,20 +209,97 @@ class HallBookingDetails extends StatelessWidget {
                         ),
 
                         decoration: BoxDecoration(
-                          color: Colors.green.shade100,
+                          color: status == 'Confirmed'
+                              ? Colors.green.shade100
+                              : Colors.orange.shade100,
+
                           borderRadius:
                               BorderRadius.circular(20),
                         ),
 
                         child: Text(
-                          'Status: '
-                          '${data['status'] ?? '-'}',
+                          'Status: $status',
                           style: TextStyle(
-                            color: Colors.green.shade800,
+                            color: status == 'Confirmed'
+                                ? Colors.green.shade800
+                                : Colors.orange.shade800,
+
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
+
+                      // Confirm Button
+                      if (status != 'Confirmed') ...[
+                        const SizedBox(height: 15),
+
+                        SizedBox(
+                          width: double.infinity,
+
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              try {
+                                await FirebaseFirestore
+                                    .instance
+                                    .collection('hallBookings')
+                                    .doc(booking.id)
+                                    .update({
+                                  'status': 'Confirmed',
+                                });
+
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Hall booking confirmed successfully',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Error: $e',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+
+                            icon: const Icon(Icons.check),
+
+                            label: const Text(
+                              'Confirm Booking',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color(0xFF3F4A32),
+
+                              foregroundColor: Colors.white,
+
+                              padding:
+                                  const EdgeInsets.symmetric(
+                                vertical: 12,
+                              ),
+
+                              shape:
+                                  RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),

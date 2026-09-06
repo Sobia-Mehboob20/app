@@ -84,7 +84,11 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
         'numberOfNights': numberOfNights,
         'pricePerNight': priceNumber,
         'totalPrice': totalPrice,
-        'status': 'confirmed',
+
+        // Booking will remain Pending
+        // until receptionist confirms it
+        'status': 'Pending',
+
         'createdAt': FieldValue.serverTimestamp(),
       });
 
@@ -92,7 +96,9 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Booking saved successfully!'),
+          content: Text(
+            'Booking request submitted. Waiting for confirmation.',
+          ),
         ),
       );
 
@@ -155,10 +161,8 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
               child: Image.asset(
                 widget.image,
-
                 width: double.infinity,
                 height: 190,
-
                 fit: BoxFit.cover,
               ),
             ),

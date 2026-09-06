@@ -92,12 +92,16 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
         'decoration': widget.decoration,
         'stageRequired': widget.stageRequired,
         'soundSystemRequired': widget.soundSystemRequired,
+
         'hallPrice': hallPrice,
         'decorationPrice': decorationPrice,
         'stagePrice': stagePrice,
         'soundPrice': soundPrice,
         'totalPrice': totalPrice,
-        'status': 'confirmed',
+
+        // Customer booking starts as Pending
+        'status': 'Pending',
+
         'createdAt': FieldValue.serverTimestamp(),
       });
 
@@ -107,6 +111,8 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
         isSaving = false;
       });
 
+      // ---------------- SUCCESS MESSAGE ----------------
+
       showDialog(
         context: context,
         builder: (context) {
@@ -114,7 +120,7 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
             backgroundColor: const Color(0xFFF5F0E8),
 
             title: const Text(
-              'Booking Confirmed',
+              'Booking Submitted',
               style: TextStyle(
                 color: Color(0xFF3F4A32),
                 fontWeight: FontWeight.bold,
@@ -122,8 +128,9 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
             ),
 
             content: const Text(
-              'Your event booking has been '
-              'saved successfully.',
+              'Your event booking request has been '
+              'submitted successfully. It is currently Pending '
+              'and will be confirmed by the receptionist.',
             ),
 
             actions: [
@@ -131,7 +138,6 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-
                 child: const Text(
                   'OK',
                   style: TextStyle(
@@ -151,9 +157,11 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
         isSaving = false;
       });
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Booking failed: $error')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Booking failed: $error'),
+        ),
+      );
     }
   }
 
@@ -174,7 +182,9 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
           ),
         ),
 
-        iconTheme: const IconThemeData(color: Color(0xFFF5F0E8)),
+        iconTheme: const IconThemeData(
+          color: Color(0xFFF5F0E8),
+        ),
       ),
 
       body: SingleChildScrollView(
@@ -195,33 +205,59 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
 
             const SizedBox(height: 20),
 
+            // ---------------- BOOKING INFORMATION ----------------
+
             _infoCard(
               children: [
-                _infoRow('Banquet Hall', widget.hallName),
+                _infoRow(
+                  'Banquet Hall',
+                  widget.hallName,
+                ),
 
-                _infoRow('Event Type', widget.eventType),
+                _infoRow(
+                  'Event Type',
+                  widget.eventType,
+                ),
 
-                _infoRow('Event Date', formattedDate),
+                _infoRow(
+                  'Event Date',
+                  formattedDate,
+                ),
 
-                _infoRow('Guests', '${widget.guests}'),
+                _infoRow(
+                  'Guests',
+                  '${widget.guests}',
+                ),
 
-                _infoRow('Seating', widget.seating),
+                _infoRow(
+                  'Seating',
+                  widget.seating,
+                ),
 
-                _infoRow('Decoration', widget.decoration),
+                _infoRow(
+                  'Decoration',
+                  widget.decoration,
+                ),
 
                 _infoRow(
                   'Stage',
-                  widget.stageRequired ? 'Required' : 'Not Required',
+                  widget.stageRequired
+                      ? 'Required'
+                      : 'Not Required',
                 ),
 
                 _infoRow(
                   'Sound System',
-                  widget.soundSystemRequired ? 'Required' : 'Not Required',
+                  widget.soundSystemRequired
+                      ? 'Required'
+                      : 'Not Required',
                 ),
               ],
             ),
 
             const SizedBox(height: 25),
+
+            // ---------------- PRICE DETAILS ----------------
 
             const Text(
               'Price Details',
@@ -236,18 +272,33 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
 
             _infoCard(
               children: [
-                _priceRow('Hall', hallPrice),
+                _priceRow(
+                  'Hall',
+                  hallPrice,
+                ),
 
-                _priceRow('Decoration', decorationPrice),
+                _priceRow(
+                  'Decoration',
+                  decorationPrice,
+                ),
 
-                _priceRow('Stage', stagePrice),
+                _priceRow(
+                  'Stage',
+                  stagePrice,
+                ),
 
-                _priceRow('Sound System', soundPrice),
+                _priceRow(
+                  'Sound System',
+                  soundPrice,
+                ),
 
-                const Divider(color: Color(0xFF3F4A32)),
+                const Divider(
+                  color: Color(0xFF3F4A32),
+                ),
 
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment:
+                      MainAxisAlignment.spaceBetween,
 
                   children: [
                     const Text(
@@ -275,6 +326,7 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
             const SizedBox(height: 35),
 
             // ---------------- CONFIRM BUTTON ----------------
+
             SizedBox(
               width: double.infinity,
 
@@ -282,14 +334,18 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
                 onPressed: isSaving ? null : saveBooking,
 
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3F4A32),
+                  backgroundColor:
+                      const Color(0xFF3F4A32),
 
                   foregroundColor: Colors.white,
 
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                  ),
 
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(12),
                   ),
                 ),
 
@@ -297,6 +353,7 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
                     ? const SizedBox(
                         height: 22,
                         width: 22,
+
                         child: CircularProgressIndicator(
                           color: Colors.white,
                           strokeWidth: 2,
@@ -319,7 +376,9 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
 
   // ---------------- INFO CARD ----------------
 
-  Widget _infoCard({required List<Widget> children}) {
+  Widget _infoCard({
+    required List<Widget> children,
+  }) {
     return Container(
       width: double.infinity,
 
@@ -327,29 +386,44 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
 
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
 
-        border: Border.all(color: const Color(0xFF3F4A32)),
+        borderRadius:
+            BorderRadius.circular(14),
+
+        border: Border.all(
+          color: const Color(0xFF3F4A32),
+        ),
       ),
 
-      child: Column(children: children),
+      child: Column(
+        children: children,
+      ),
     );
   }
 
   // ---------------- INFO ROW ----------------
 
-  Widget _infoRow(String title, String value) {
+  Widget _infoRow(
+    String title,
+    String value,
+  ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 13),
+      padding:
+          const EdgeInsets.only(bottom: 13),
 
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
 
         children: [
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(fontSize: 15, color: Colors.black87),
+
+              style: const TextStyle(
+                fontSize: 15,
+                color: Colors.black87,
+              ),
             ),
           ),
 
@@ -358,12 +432,12 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
           Expanded(
             child: Text(
               value,
+
               textAlign: TextAlign.right,
 
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
-
                 color: Color(0xFF3F4A32),
               ),
             ),
@@ -375,22 +449,35 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
 
   // ---------------- PRICE ROW ----------------
 
-  Widget _priceRow(String title, double price) {
+  Widget _priceRow(
+    String title,
+    double price,
+  ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 13),
+      padding:
+          const EdgeInsets.only(bottom: 13),
 
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment:
+            MainAxisAlignment.spaceBetween,
 
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 15, color: Colors.black87),
+
+            style: const TextStyle(
+              fontSize: 15,
+              color: Colors.black87,
+            ),
           ),
 
           Text(
             'PKR ${price.toStringAsFixed(0)}',
-            style: const TextStyle(fontSize: 15, color: Colors.black87),
+
+            style: const TextStyle(
+              fontSize: 15,
+              color: Colors.black87,
+            ),
           ),
         ],
       ),
