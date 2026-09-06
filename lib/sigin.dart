@@ -1,4 +1,5 @@
 
+import 'package:app/customer_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -70,11 +71,11 @@ class _SigninState extends State<Signin> {
       if (!mounted) return;
 
       // Manager → Manager Dashboard
-      if (widget.role == "Manager") {
+      if (widget.role == "customer") {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (context) => const ManagerDashboard(),
+            builder: (context) => const CustomerDashboard(),
           ),
           (route) => false,
         );

@@ -1,4 +1,5 @@
 
+import 'package:app/customer_dashboard.dart';
 import 'package:app/receptionist.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -91,7 +92,19 @@ class _LoginState extends State<Login> {
       ),
       );
       
-    } }
+    } 
+    else if (widget.role == "Customer")
+    {
+    
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CustomerDashboard(),
+      ),
+          
+      );
+      
+    }}
 
  else {
   ScaffoldMessenger.of(context).showSnackBar(
