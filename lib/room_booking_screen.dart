@@ -1,417 +1,352 @@
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class RoomBookingDetails extends StatelessWidget {
-  const RoomBookingDetails({super.key});
+class RoomBookingScreen extends StatefulWidget {
+  final String roomId;
+  final String roomName;
+  final String price;
+  final String image;
+  final DateTime checkInDate;
+  final DateTime checkOutDate;
+  final int adults;
+  final int children;
 
-  // ================= FORMAT DATE =================
+  const RoomBookingScreen({
+    super.key,
+    required this.roomId,
+    required this.roomName,
+    required this.price,
+    required this.image,
+    required this.checkInDate,
+    required this.checkOutDate,
+    required this.adults,
+    required this.children,
+  });
 
-  String formatDate(dynamic value) {
-    if (value == null) {
-      return '-';
-    }
+  @override
+  State<RoomBookingScreen> createState() => _RoomBookingScreenState();
+}
 
-    if (value is Timestamp) {
-      final date = value.toDate();
-      return '${date.day}/${date.month}/${date.year}';
-    }
+class _RoomBookingScreenState extends State<RoomBookingScreen> {
+  bool isBooking = false;
 
-    if (value is DateTime) {
-      return '${value.day}/${value.month}/${value.year}';
-    }
+  int get numberOfNights {
+    final difference =
+        widget.checkOutDate.difference(widget.checkInDate).inDays;
 
-    return value.toString();
+    return difference <= 0 ? 1 : difference;
   }
 
-  // ================= BUILD =================
+  double get priceNumber {
+    return double.tryParse(
+          widget.price.replaceAll(RegExp(r'[^0-9.]'), ''),
+        ) ??
+        0;
+  }
+
+  double get totalPrice {
+    return priceNumber * numberOfNights;
+  }
+
+  String formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  Future<void> confirmBooking() async {
+    if (isBooking) return;
+
+    setState(() {
+      isBooking = true;
+    });
+
+    try {
+      final bookingRef =
+          await FirebaseFirestore.instance.collection('roomBookings').add({
+        'hotelName': 'Aurelia Grand',
+        'bookingType': 'Room',
+
+        'roomId': widget.roomId,
+        'roomType': widget.roomName,
+        'image': widget.image,
+
+        'checkIn': Timestamp.fromDate(widget.checkInDate),
+        'checkOut': Timestamp.fromDate(widget.checkOutDate),
+
+        'adults': widget.adults,
+        'children': widget.children,
+        'nights': numberOfNights,
+
+        'pricePerNight': priceNumber,
+        'totalAmount': totalPrice,
+
+        'paymentMethod': 'Not Paid',
+        'paymentStatus': 'Pending',
+
+        'bookingStatus': 'Pending',
+
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      // Check in Debug Console that booking was actually saved.
+      debugPrint('BOOKING SAVED: ${bookingRef.id}');
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Room booking submitted successfully!',
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.pop(context);
+    } catch (e) {
+      debugPrint('BOOKING ERROR: $e');
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Booking failed: $e',
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isBooking = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F0E8),
 
-      // ================= APP BAR =================
-
       appBar: AppBar(
         backgroundColor: const Color(0xFF3F4A32),
         foregroundColor: Colors.white,
-
         title: const Text(
-          'Room Booking Details',
+          'Room Booking',
           style: TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
 
-      // ================= FIRESTORE =================
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
 
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('bookings')
-            .snapshots(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
 
-        builder: (context, snapshot) {
-          // LOADING
-          if (snapshot.connectionState ==
-              ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+            // ROOM IMAGE
+            if (widget.image.isNotEmpty)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(15),
 
-          // ERROR
-          if (snapshot.hasError) {
-            return Center(
+                child: Image.network(
+                  widget.image,
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+
+                  errorBuilder:
+                      (context, error, stackTrace) {
+                    return Container(
+                      width: double.infinity,
+                      height: 200,
+                      color: Colors.grey.shade300,
+
+                      child: const Icon(
+                        Icons.hotel,
+                        size: 70,
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+            const SizedBox(height: 20),
+
+            // ROOM NAME
+            Text(
+              widget.roomName,
+
+              style: const TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF3F4A32),
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            Text(
+              'Room ID: ${widget.roomId}',
+
+              style: const TextStyle(
+                fontSize: 16,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // BOOKING INFORMATION
+            Card(
+              color: Colors.white,
+              elevation: 3,
+
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+
               child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text(
-                  'Error: ${snapshot.error}',
-                  textAlign: TextAlign.center,
+                padding: const EdgeInsets.all(18),
+
+                child: Column(
+                  children: [
+
+                    _infoRow(
+                      'Check-in',
+                      formatDate(widget.checkInDate),
+                    ),
+
+                    _infoRow(
+                      'Check-out',
+                      formatDate(widget.checkOutDate),
+                    ),
+
+                    _infoRow(
+                      'Adults',
+                      widget.adults.toString(),
+                    ),
+
+                    _infoRow(
+                      'Children',
+                      widget.children.toString(),
+                    ),
+
+                    _infoRow(
+                      'Nights',
+                      numberOfNights.toString(),
+                    ),
+
+                    _infoRow(
+                      'Price per night',
+                      'PKR ${priceNumber.toStringAsFixed(0)}',
+                    ),
+
+                    const Divider(
+                      height: 25,
+                    ),
+
+                    _infoRow(
+                      'Total Amount',
+                      'PKR ${totalPrice.toStringAsFixed(0)}',
+                      bold: true,
+                    ),
+                  ],
                 ),
               ),
-            );
-          }
+            ),
 
-          // NO DATA
-          if (!snapshot.hasData) {
-            return const Center(
-              child: Text(
-                'No bookings found',
-                style: TextStyle(fontSize: 18),
-              ),
-            );
-          }
+            const SizedBox(height: 25),
 
-          // ================= ONLY ROOM BOOKINGS =================
+            // CONFIRM BOOKING BUTTON
+            SizedBox(
+              width: double.infinity,
+              height: 52,
 
-          final bookings = snapshot.data!.docs.where((doc) {
-            final data =
-                doc.data() as Map<String, dynamic>;
+              child: ElevatedButton(
+                onPressed:
+                    isBooking ? null : confirmBooking,
 
-            return data['bookingType'] == 'Room';
-          }).toList();
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      const Color(0xFF3F4A32),
 
-          // NO ROOM BOOKINGS
-          if (bookings.isEmpty) {
-            return const Center(
-              child: Text(
-                'No room bookings found',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            );
-          }
+                  foregroundColor: Colors.white,
 
-          // ================= BOOKING LIST =================
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: bookings.length,
-
-            itemBuilder: (context, index) {
-              final booking = bookings[index];
-
-              final data =
-                  booking.data()
-                      as Map<String, dynamic>;
-
-              final status =
-                  data['bookingStatus']
-                      ?.toString() ??
-                  'Pending';
-
-              return Card(
-                margin:
-                    const EdgeInsets.only(bottom: 16),
-
-                elevation: 4,
-
-                color:
-                    const Color(0xFFFAF8F3),
-
-                shape:
-                    RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(15),
-                ),
-
-                child: Padding(
-                  padding:
-                      const EdgeInsets.all(18),
-
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-
-                    children: [
-
-                      // ================= ROOM NAME =================
-
-                      Text(
-                        data['roomType']
-                                ?.toString() ??
-                            'Room',
-
-                        style:
-                            const TextStyle(
-                          fontSize: 21,
-                          fontWeight:
-                              FontWeight.bold,
-                          color:
-                              Color(0xFF3F4A32),
-                        ),
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      Text(
-                        'Room ID: '
-                        '${data['roomId'] ?? '-'}',
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      Text(
-                        'Hotel: '
-                        '${data['hotelName'] ?? '-'}',
-                      ),
-
-                      const SizedBox(height: 15),
-
-                      const Divider(),
-
-                      const SizedBox(height: 10),
-
-                      // ================= DATES =================
-
-                      Text(
-                        'Check-in: '
-                        '${formatDate(data['checkIn'])}',
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      Text(
-                        'Check-out: '
-                        '${formatDate(data['checkOut'])}',
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      // ================= GUESTS =================
-
-                      Text(
-                        'Adults: '
-                        '${data['adults'] ?? '-'}',
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      Text(
-                        'Children: '
-                        '${data['children'] ?? '-'}',
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      Text(
-                        'Nights: '
-                        '${data['nights'] ?? '-'}',
-                      ),
-
-                      const SizedBox(height: 15),
-
-                      const Divider(),
-
-                      const SizedBox(height: 10),
-
-                      // ================= PRICE =================
-
-                      Text(
-                        'Price Per Night: PKR '
-                        '${data['pricePerNight'] ?? 0}',
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      Text(
-                        'Payment Method: '
-                        '${data['paymentMethod'] ?? '-'}',
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      Text(
-                        'Payment Status: '
-                        '${data['paymentStatus'] ?? '-'}',
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      Text(
-                        'Total Amount: PKR '
-                        '${data['totalAmount'] ?? 0}',
-
-                        style:
-                            const TextStyle(
-                          fontSize: 17,
-                          fontWeight:
-                              FontWeight.bold,
-                          color:
-                              Color(0xFF3F4A32),
-                        ),
-                      ),
-
-                      const SizedBox(height: 15),
-
-                      // ================= STATUS =================
-
-                      Container(
-                        padding:
-                            const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-
-                        decoration:
-                            BoxDecoration(
-                          color: status ==
-                                  'Confirmed'
-                              ? Colors.green
-                                  .shade100
-                              : status ==
-                                      'Rejected'
-                                  ? Colors.red
-                                      .shade100
-                                  : Colors.orange
-                                      .shade100,
-
-                          borderRadius:
-                              BorderRadius.circular(
-                                  20),
-                        ),
-
-                        child: Text(
-                          'Status: $status',
-
-                          style:
-                              TextStyle(
-                            fontWeight:
-                                FontWeight.bold,
-
-                            color: status ==
-                                    'Confirmed'
-                                ? Colors.green
-                                    .shade800
-                                : status ==
-                                        'Rejected'
-                                    ? Colors.red
-                                        .shade800
-                                    : Colors.orange
-                                        .shade800,
-                          ),
-                        ),
-                      ),
-
-                      // ================= CONFIRM BUTTON =================
-
-                      if (status == 'Pending') ...[
-                        const SizedBox(height: 15),
-
-                        SizedBox(
-                          width: double.infinity,
-
-                          child:
-                              ElevatedButton.icon(
-                            onPressed: () async {
-                              try {
-                                await FirebaseFirestore
-                                    .instance
-                                    .collection(
-                                        'bookings')
-                                    .doc(
-                                        booking.id)
-                                    .update({
-                                  'bookingStatus':
-                                      'Confirmed',
-                                });
-
-                                if (context
-                                    .mounted) {
-                                  ScaffoldMessenger
-                                      .of(context)
-                                      .showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Room booking confirmed successfully',
-                                      ),
-                                    ),
-                                  );
-                                }
-                              } catch (e) {
-                                if (context
-                                    .mounted) {
-                                  ScaffoldMessenger
-                                      .of(context)
-                                      .showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Error: $e',
-                                      ),
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-
-                            icon: const Icon(
-                              Icons.check,
-                            ),
-
-                            label: const Text(
-                              'Confirm Booking',
-                              style: TextStyle(
-                                fontWeight:
-                                    FontWeight.bold,
-                              ),
-                            ),
-
-                            style:
-                                ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color(
-                                      0xFF3F4A32),
-
-                              foregroundColor:
-                                  Colors.white,
-
-                              padding:
-                                  const EdgeInsets
-                                      .symmetric(
-                                vertical: 12,
-                              ),
-
-                              shape:
-                                  RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius
-                                        .circular(
-                                            10),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(12),
                   ),
                 ),
-              );
-            },
-          );
-        },
+
+                child: isBooking
+                    ? const SizedBox(
+                        height: 24,
+                        width: 24,
+
+                        child:
+                            CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 3,
+                        ),
+                      )
+
+                    : const Text(
+                        'Confirm Booking',
+
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _infoRow(
+    String title,
+    String value, {
+    bool bold = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 7,
+      ),
+
+      child: Row(
+        mainAxisAlignment:
+            MainAxisAlignment.spaceBetween,
+
+        children: [
+          Text(
+            title,
+
+            style: const TextStyle(
+              fontSize: 15,
+            ),
+          ),
+
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: bold
+                    ? FontWeight.bold
+                    : FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

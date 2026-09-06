@@ -18,19 +18,27 @@ class RoomBookingDetails extends StatelessWidget {
           .collection('roomBookings')
           .doc(bookingId)
           .update({
-        'status': 'Confirmed',
+        'bookingStatus': 'Confirmed',
       });
+
+      if (!context.mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Room booking confirmed successfully'),
+          content: Text(
+            'Room booking confirmed successfully',
+          ),
           backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
+      if (!context.mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error confirming booking: $e'),
+          content: Text(
+            'Error confirming booking: $e',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -44,11 +52,17 @@ class RoomBookingDetails extends StatelessWidget {
 
       appBar: AppBar(
         backgroundColor: const Color(0xFF3F4A32),
+        foregroundColor: Colors.white,
         title: const Text(
           'Room Booking Details',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
       ),
 
       body: StreamBuilder<QuerySnapshot>(
@@ -57,7 +71,8 @@ class RoomBookingDetails extends StatelessWidget {
             .snapshots(),
 
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState ==
+              ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
@@ -65,7 +80,13 @@ class RoomBookingDetails extends StatelessWidget {
 
           if (snapshot.hasError) {
             return Center(
-              child: Text('Error: ${snapshot.error}'),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  'Error: ${snapshot.error}',
+                  textAlign: TextAlign.center,
+                ),
+              ),
             );
           }
 
@@ -74,7 +95,10 @@ class RoomBookingDetails extends StatelessWidget {
             return const Center(
               child: Text(
                 'No room bookings found',
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             );
           }
@@ -91,13 +115,20 @@ class RoomBookingDetails extends StatelessWidget {
               final data =
                   booking.data() as Map<String, dynamic>;
 
-              final status = data['status'] ?? '-';
+              final status =
+                  data['bookingStatus'] ?? 'Pending';
 
               return Card(
-                margin: const EdgeInsets.only(bottom: 16),
+                margin: const EdgeInsets.only(
+                  bottom: 16,
+                ),
                 color: const Color(0xFFFAF8F3),
+
+                elevation: 3,
+
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius:
+                      BorderRadius.circular(15),
                 ),
 
                 child: Padding(
@@ -108,8 +139,10 @@ class RoomBookingDetails extends StatelessWidget {
                         CrossAxisAlignment.start,
 
                     children: [
+                      // Room Name
                       Text(
-                        data['roomName'] ?? 'Room',
+                        data['roomType'] ?? 'Room',
+
                         style: const TextStyle(
                           fontSize: 21,
                           fontWeight: FontWeight.bold,
@@ -119,58 +152,109 @@ class RoomBookingDetails extends StatelessWidget {
 
                       const SizedBox(height: 12),
 
+                      // Hotel Name
+                      Text(
+                        'Hotel: ${data['hotelName'] ?? 'Aurelia Grand'}',
+                      ),
+
+                      const SizedBox(height: 5),
+
+                      // Room ID
                       Text(
                         'Room ID: ${data['roomId'] ?? '-'}',
                       ),
 
+                      const SizedBox(height: 5),
+
+                      // Check In
                       Text(
-                        'Check-in: ${formatDate(data['checkIn'])}',
+                        'Check-in: ${data['checkIn'] != null ? formatDate(data['checkIn']) : '-'}',
                       ),
 
+                      const SizedBox(height: 5),
+
+                      // Check Out
                       Text(
-                        'Check-out: ${formatDate(data['checkOut'])}',
+                        'Check-out: ${data['checkOut'] != null ? formatDate(data['checkOut']) : '-'}',
                       ),
 
+                      const SizedBox(height: 5),
+
+                      // Adults
                       Text(
                         'Adults: ${data['adults'] ?? 0}',
                       ),
 
+                      const SizedBox(height: 5),
+
+                      // Children
                       Text(
                         'Children: ${data['children'] ?? 0}',
                       ),
 
+                      const SizedBox(height: 5),
+
+                      // Nights
                       Text(
-                        'Nights: ${data['numberOfNights'] ?? 0}',
+                        'Nights: ${data['nights'] ?? 0}',
                       ),
 
+                      const SizedBox(height: 5),
+
+                      // Price Per Night
                       Text(
                         'Price per Night: PKR ${data['pricePerNight'] ?? 0}',
                       ),
 
+                      const SizedBox(height: 5),
+
+                      // Total Amount
                       Text(
-                        'Total Price: PKR ${data['totalPrice'] ?? 0}',
+                        'Total Amount: PKR ${data['totalAmount'] ?? 0}',
+
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
+                      ),
+
+                      const SizedBox(height: 5),
+
+                      // Payment Method
+                      Text(
+                        'Payment Method: ${data['paymentMethod'] ?? 'Not Paid'}',
+                      ),
+
+                      const SizedBox(height: 5),
+
+                      // Payment Status
+                      Text(
+                        'Payment Status: ${data['paymentStatus'] ?? 'Pending'}',
                       ),
 
                       const SizedBox(height: 10),
 
+                      // Booking Status
                       Text(
-                        'Status: $status',
+                        'Booking Status: $status',
+
                         style: TextStyle(
                           color: status == 'Confirmed'
                               ? Colors.green
                               : Colors.orange,
+
                           fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
                       ),
 
                       const SizedBox(height: 15),
 
+                      // Confirm Button
                       if (status != 'Confirmed')
                         SizedBox(
                           width: double.infinity,
+
                           child: ElevatedButton(
                             onPressed: () {
                               confirmBooking(
@@ -178,26 +262,77 @@ class RoomBookingDetails extends StatelessWidget {
                                 booking.id,
                               );
                             },
-                            style: ElevatedButton.styleFrom(
+
+                            style:
+                                ElevatedButton.styleFrom(
                               backgroundColor:
                                   const Color(0xFF3F4A32),
-                              foregroundColor: Colors.white,
+
+                              foregroundColor:
+                                  Colors.white,
+
                               padding:
                                   const EdgeInsets.symmetric(
                                 vertical: 13,
                               ),
-                              shape: RoundedRectangleBorder(
+
+                              shape:
+                                  RoundedRectangleBorder(
                                 borderRadius:
-                                    BorderRadius.circular(10),
+                                    BorderRadius.circular(
+                                  10,
+                                ),
                               ),
                             ),
+
                             child: const Text(
                               'Confirm Booking',
+
                               style: TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                fontWeight:
+                                    FontWeight.bold,
                               ),
                             ),
+                          ),
+                        ),
+
+                      // Confirmed Message
+                      if (status == 'Confirmed')
+                        Container(
+                          width: double.infinity,
+
+                          padding:
+                              const EdgeInsets.all(12),
+
+                          decoration: BoxDecoration(
+                            color:
+                                Colors.green.shade50,
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              10,
+                            ),
+                          ),
+
+                          child: const Row(
+                            children: [
+                              Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                              ),
+
+                              SizedBox(width: 8),
+
+                              Text(
+                                'Booking Confirmed',
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontWeight:
+                                      FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                     ],
