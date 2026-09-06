@@ -20,6 +20,9 @@ class DecorationsScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+         iconTheme: const IconThemeData(
+          color: Color(0xFFF5F0E8),
+        ),
       ),
 
       body: ListView(

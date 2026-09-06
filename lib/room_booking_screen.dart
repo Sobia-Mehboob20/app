@@ -66,53 +66,76 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
   // SAVE BOOKING TO FIREBASE
   // =====================================================
 
-  Future<void> confirmBooking() async {
-    setState(() {
-      isBooking = true;
+
+// =====================================================
+// SAVE BOOKING TO FIREBASE
+// =====================================================
+
+Future<void> confirmBooking() async {
+  setState(() {
+    isBooking = true;
+  });
+
+  try {
+    await FirebaseFirestore.instance.collection('bookings').add({
+      // Hotel information
+      'hotelName': 'Aurelia Grand',
+
+      // Room information
+      'roomId': widget.roomId,
+      'roomType': widget.roomName,
+
+      // Dates
+      'checkIn': Timestamp.fromDate(widget.checkInDate),
+      'checkOut': Timestamp.fromDate(widget.checkOutDate),
+
+      // Guests
+      'adults': widget.adults,
+      'children': widget.children,
+
+      // Stay information
+      'nights': numberOfNights,
+
+      // Payment information
+      'pricePerNight': priceNumber,
+      'totalAmount': totalPrice,
+      'paymentMethod': 'Not Paid',
+      'paymentStatus': 'Pending',
+
+      // Booking information
+      'bookingStatus': 'Confirmed',
+
+      // Created time
+      'createdAt': FieldValue.serverTimestamp(),
     });
 
-    try {
-      await FirebaseFirestore.instance
-          .collection('roomBookings')
-          .add({
-        'roomId': widget.roomId,
-        'roomName': widget.roomName,
-        'checkIn': Timestamp.fromDate(widget.checkInDate),
-        'checkOut': Timestamp.fromDate(widget.checkOutDate),
-        'adults': widget.adults,
-        'children': widget.children,
-        'numberOfNights': numberOfNights,
-        'pricePerNight': priceNumber,
-        'totalPrice': totalPrice,
-        'status': 'confirmed',
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+    if (!mounted) return;
 
-      if (!mounted) return;
+    setState(() {
+      isBooking = false;
+    });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Booking saved successfully!'),
-        ),
-      );
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Booking saved successfully!'),
+        backgroundColor: Color(0xFF3F4A32),
+      ),
+    );
+  } catch (e) {
+    if (!mounted) return;
 
-      setState(() {
-        isBooking = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
+    setState(() {
+      isBooking = false;
+    });
 
-      setState(() {
-        isBooking = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Booking failed: $e'),
-        ),
-      );
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Booking failed: $e'),
+      ),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

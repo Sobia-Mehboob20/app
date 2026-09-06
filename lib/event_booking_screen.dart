@@ -76,86 +76,109 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
 
   // ---------------- SAVE BOOKING ----------------
 
-  Future<void> saveBooking() async {
-    setState(() {
-      isSaving = true;
+ // ---------------- SAVE BOOKING ----------------
+
+Future<void> saveBooking() async {
+  setState(() {
+    isSaving = true;
+  });
+
+  try {
+    await FirebaseFirestore.instance.collection('bookings').add({
+      // Common booking information
+      'bookingType': 'Event',
+      'hotelName': 'Aurelia Grand',
+
+      // These common fields help the Manager screens
+      'roomType': widget.hallName,
+      'checkIn': Timestamp.fromDate(widget.eventDate),
+      'checkOut': Timestamp.fromDate(widget.eventDate),
+      'nights': 1,
+
+      // Event information
+      'hallName': widget.hallName,
+      'capacity': widget.capacity,
+      'eventDate': Timestamp.fromDate(widget.eventDate),
+      'eventType': widget.eventType,
+      'guests': widget.guests,
+      'seating': widget.seating,
+      'decoration': widget.decoration,
+      'stageRequired': widget.stageRequired,
+      'soundSystemRequired': widget.soundSystemRequired,
+
+      // Price information
+      'hallPrice': hallPrice,
+      'decorationPrice': decorationPrice,
+      'stagePrice': stagePrice,
+      'soundPrice': soundPrice,
+      'totalAmount': totalPrice,
+
+      // Payment information
+      'paymentMethod': 'Not Paid',
+      'paymentStatus': 'Pending',
+
+      // Booking status
+      'bookingStatus': 'Confirmed',
+
+      // Created time
+      'createdAt': FieldValue.serverTimestamp(),
     });
 
-    try {
-      await FirebaseFirestore.instance.collection('hallBookings').add({
-        'hallName': widget.hallName,
-        'capacity': widget.capacity,
-        'eventDate': Timestamp.fromDate(widget.eventDate),
-        'eventType': widget.eventType,
-        'guests': widget.guests,
-        'seating': widget.seating,
-        'decoration': widget.decoration,
-        'stageRequired': widget.stageRequired,
-        'soundSystemRequired': widget.soundSystemRequired,
-        'hallPrice': hallPrice,
-        'decorationPrice': decorationPrice,
-        'stagePrice': stagePrice,
-        'soundPrice': soundPrice,
-        'totalPrice': totalPrice,
-        'status': 'confirmed',
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+    if (!mounted) return;
 
-      if (!mounted) return;
+    setState(() {
+      isSaving = false;
+    });
 
-      setState(() {
-        isSaving = false;
-      });
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFFF5F0E8),
 
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: const Color(0xFFF5F0E8),
-
-            title: const Text(
-              'Booking Confirmed',
-              style: TextStyle(
-                color: Color(0xFF3F4A32),
-                fontWeight: FontWeight.bold,
-              ),
+          title: const Text(
+            'Booking Confirmed',
+            style: TextStyle(
+              color: Color(0xFF3F4A32),
+              fontWeight: FontWeight.bold,
             ),
+          ),
 
-            content: const Text(
-              'Your event booking has been '
-              'saved successfully.',
-            ),
+          content: const Text(
+            'Your event booking has been saved successfully.',
+          ),
 
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-
-                child: const Text(
-                  'OK',
-                  style: TextStyle(
-                    color: Color(0xFF3F4A32),
-                    fontWeight: FontWeight.bold,
-                  ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text(
+                'OK',
+                style: TextStyle(
+                  color: Color(0xFF3F4A32),
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
-          );
-        },
-      );
-    } catch (error) {
-      if (!mounted) return;
+            ),
+          ],
+        );
+      },
+    );
+  } catch (error) {
+    if (!mounted) return;
 
-      setState(() {
-        isSaving = false;
-      });
+    setState(() {
+      isSaving = false;
+    });
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Booking failed: $error')));
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Booking failed: $error'),
+      ),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {

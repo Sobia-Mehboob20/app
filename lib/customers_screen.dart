@@ -24,6 +24,9 @@ class CustomersScreen extends StatelessWidget {
             fontWeight: FontWeight.normal,
           ),
         ),
+         iconTheme: const IconThemeData(
+          color: Color(0xFFF5F0E8),
+        ),
       ),
 
       body: StreamBuilder<QuerySnapshot>(

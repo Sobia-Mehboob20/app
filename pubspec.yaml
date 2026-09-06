@@ -26,12 +26,12 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/logo.jpg
-    - assets/logo/
-    - assets/restaurants/
-    - assets/conferences/
-    - assets/decorations/
-    - assets/health_club/
+  - assets/images/
+  - assets/logo/
+  - assets/restaurants/
+  - assets/conferences/
+  - assets/decorations/
+  - assets/health_club/
 
 dependency_overrides:
   firebase_core_web: 3.10.0
