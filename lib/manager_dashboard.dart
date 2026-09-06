@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
 
-// Your screens
-import 'roomscreen.dart';
-import 'banquet_halls_screen.dart';
-import 'special_offers_screen.dart';
 import 'customers_screen.dart';
-// Member 3 screens
-// Add these imports when Member 3 gives you the exact file names.
-// import 'restaurants_screen.dart';
-// import 'conferences_screen.dart';
-// import 'decorations_screen.dart';
-// import 'health_club_screen.dart';
+import 'manager_bookings_screen.dart';
+import 'manager_payments_screen.dart';
+import 'manager_reports_screen.dart';
 
 class ManagerDashboard extends StatefulWidget {
   const ManagerDashboard({super.key});
@@ -26,9 +19,9 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
   int _selectedIndex = 0;
 
-  // ---------------------------------------------------------
+  // =========================================================
   // BOTTOM NAVIGATION
-  // ---------------------------------------------------------
+  // =========================================================
 
   void _onBottomNavTap(int index) {
     setState(() {
@@ -36,9 +29,9 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
     });
   }
 
-  // ---------------------------------------------------------
+  // =========================================================
   // BUILD
-  // ---------------------------------------------------------
+  // =========================================================
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +48,9 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
         ],
       ),
 
-      // -----------------------------------------------------
+      // =====================================================
       // BOTTOM NAVIGATION
-      // -----------------------------------------------------
+      // =====================================================
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
@@ -69,18 +62,6 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
         selectedItemColor: green,
         unselectedItemColor: lightGrey,
-
-        selectedLabelStyle: const TextStyle(
-          color: green,
-          fontSize: 11,
-          fontWeight: FontWeight.normal,
-        ),
-
-        unselectedLabelStyle: const TextStyle(
-          color: lightGrey,
-          fontSize: 11,
-          fontWeight: FontWeight.normal,
-        ),
 
         items: const [
           BottomNavigationBarItem(
@@ -119,7 +100,6 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
     return SafeArea(
       child: CustomScrollView(
         slivers: [
-
           // -------------------------------------------------
           // APP BAR
           // -------------------------------------------------
@@ -127,11 +107,12 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
           SliverAppBar(
             backgroundColor: green,
             elevation: 0,
-
             pinned: true,
-
             expandedHeight: 80,
 
+ iconTheme: const IconThemeData(
+          color: Color(0xFFF5F0E8),
+ ),
             title: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -140,7 +121,6 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 12,
-                    fontWeight: FontWeight.normal,
                   ),
                 ),
 
@@ -149,15 +129,12 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
-                    fontWeight: FontWeight.normal,
                   ),
                 ),
               ],
             ),
 
             actions: [
-
-              // Notification
               IconButton(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -172,7 +149,6 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                 ),
               ),
 
-              // Profile
               const Padding(
                 padding: EdgeInsets.only(right: 12),
                 child: CircleAvatar(
@@ -192,33 +168,25 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                16,
-                16,
-                16,
-                0,
-              ),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
 
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(18),
 
                 child: Stack(
                   children: [
-
                     Image.network(
                       'https://images.unsplash.com/photo-1566073771259-6a8506099945',
+
                       width: double.infinity,
                       height: 190,
                       fit: BoxFit.cover,
 
-                      errorBuilder: (
-                        context,
-                        error,
-                        stackTrace,
-                      ) {
+                      errorBuilder: (context, error, stackTrace) {
                         return Container(
                           height: 190,
                           color: green,
+
                           child: const Center(
                             child: Icon(
                               Icons.hotel,
@@ -230,35 +198,35 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                       },
                     ),
 
-                    // Dark overlay
                     Positioned.fill(
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
+
                             colors: [
                               Colors.transparent,
-                              Colors.black.withOpacity(0.65),
+                              Colors.black.withValues(alpha: 0.65),
                             ],
                           ),
                         ),
                       ),
                     ),
 
-                    // Image text
                     const Positioned(
                       left: 18,
                       bottom: 16,
+
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+
                         children: [
                           Text(
                             'Aurelia Grand',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 22,
-                              fontWeight: FontWeight.normal,
                             ),
                           ),
 
@@ -269,7 +237,6 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 12,
-                              fontWeight: FontWeight.normal,
                             ),
                           ),
                         ],
@@ -287,12 +254,7 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                16,
-                18,
-                16,
-                0,
-              ),
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
 
               child: Container(
                 width: double.infinity,
@@ -306,25 +268,23 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
 
+                  children: [
                     Text(
                       'Manage. Operate. Grow.',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 21,
-                        fontWeight: FontWeight.normal,
                       ),
                     ),
 
                     SizedBox(height: 8),
 
                     Text(
-                      'Manage all Aurelia Grand hotel services from one place.',
+                      'Manage customers, bookings, payments and reports from one place.',
                       style: TextStyle(
                         color: Colors.white70,
                         fontSize: 13,
-                        fontWeight: FontWeight.normal,
                       ),
                     ),
                   ],
@@ -339,27 +299,21 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
           const SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                16,
-                25,
-                16,
-                14,
-              ),
+              padding: EdgeInsets.fromLTRB(16, 25, 16, 14),
 
               child: Text(
-                'Hotel Management',
+                'Manager Services',
                 style: TextStyle(
                   fontSize: 21,
-                  fontWeight: FontWeight.normal,
                   color: green,
                 ),
               ),
             ),
           ),
 
-          // -------------------------------------------------
-          // MODULE GRID
-          // -------------------------------------------------
+          // =================================================
+          // MANAGER CARDS
+          // =================================================
 
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -374,213 +328,106 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
               children: [
 
-                // ROOMS
+                // =================================================
+                // CUSTOMERS
+                // =================================================
+
                 _dashboardCard(
-                  icon: Icons.hotel_outlined,
-                  title: 'Rooms',
+                  icon: Icons.people_outline,
+                  title: 'Customers',
+
                   onTap: () {
                     Navigator.push(
                       context,
+
                       MaterialPageRoute(
                         builder: (context) =>
-                            const RoomsScreen(),
+                            const CustomersScreen(),
                       ),
                     );
                   },
                 ),
 
-                // BANQUETS
-                _dashboardCard(
-                  icon: Icons.celebration_outlined,
-                  title: 'Banquets',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            const BanquetHallsScreen(),
-                      ),
-                    );
-                  },
-                ),
-
-                // SPECIAL OFFERS
-                _dashboardCard(
-                  icon: Icons.local_offer_outlined,
-                  title: 'Special Offers',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            const SpecialOffersScreen(),
-                      ),
-                    );
-                  },
-                ),
-
-                // RESTAURANTS
-                _dashboardCard(
-                  icon: Icons.restaurant_outlined,
-                  title: 'Restaurants',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Restaurant management will be connected.',
-                        ),
-                      ),
-                    );
-                  },
-                ),
-
-                // CONFERENCES
-                _dashboardCard(
-                  icon: Icons.meeting_room_outlined,
-                  title: 'Conferences',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Conference management will be connected.',
-                        ),
-                      ),
-                    );
-                  },
-                ),
-
-                // DECORATIONS
-                _dashboardCard(
-                  icon: Icons.auto_awesome_outlined,
-                  title: 'Decorations',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Decoration management will be connected.',
-                        ),
-                      ),
-                    );
-                  },
-                ),
-
-                // HEALTH CLUB
-                _dashboardCard(
-                  icon: Icons.fitness_center_outlined,
-                  title: 'Health Club',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Health Club management will be connected.',
-                        ),
-                      ),
-                    );
-                  },
-                ),
-
+                // =================================================
                 // BOOKINGS
+                // =================================================
+
                 _dashboardCard(
-                  icon: Icons.book_online_outlined,
+                  icon: Icons.calendar_month_outlined,
                   title: 'Bookings',
+
+                  onTap: () {
+                    Navigator.push(
+                      context,
+
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const ManagerBookingsScreen(),
+                      ),
+                    );
+                  },
+                ),
+
+                // =================================================
+                // PAYMENTS
+                // =================================================
+
+                _dashboardCard(
+                  icon: Icons.payment_outlined,
+                  title: 'Payments',
+
+                  onTap: () {
+                    Navigator.push(
+                      context,
+
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const ManagerPaymentsScreen(),
+                      ),
+                    );
+                  },
+                ),
+
+                // =================================================
+                // MESSAGES
+                // =================================================
+
+                _dashboardCard(
+                  icon: Icons.chat_bubble_outline,
+                  title: 'Messages',
+
                   onTap: () {
                     setState(() {
-                      _selectedIndex = 1;
+                      _selectedIndex = 2;
                     });
+                  },
+                ),
+
+                // =================================================
+                // REPORTS
+                // =================================================
+
+                _dashboardCard(
+                  icon: Icons.bar_chart_outlined,
+                  title: 'Reports',
+
+                  onTap: () {
+                    Navigator.push(
+                      context,
+
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const ManagerReportsScreen(),
+                      ),
+                    );
                   },
                 ),
               ],
             ),
           ),
 
-          // -------------------------------------------------
-          // QUICK ACTIONS
-          // -------------------------------------------------
-
           const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                16,
-                28,
-                16,
-                14,
-              ),
-
-              child: Text(
-                'Quick Actions',
-                style: TextStyle(
-                  fontSize: 21,
-                  fontWeight: FontWeight.normal,
-                  color: green,
-                ),
-              ),
-            ),
-          ),
-
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-
-              child: Row(
-                children: [
-                  Expanded(
-  child: _quickAction(
-    icon: Icons.people_outline,
-    title: 'Customers',
-    onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              const CustomersScreen(),
-        ),
-      );
-    },
-  ),
-),
-
-                  const SizedBox(width: 10),
-
-                  Expanded(
-                    child: _quickAction(
-                      icon: Icons.payment_outlined,
-                      title: 'Payments',
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Payment management will be connected.',
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  Expanded(
-                    child: _quickAction(
-                      icon: Icons.bar_chart_outlined,
-                      title: 'Reports',
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Reports will be connected.',
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 25),
+            child: SizedBox(height: 30),
           ),
         ],
       ),
@@ -614,7 +461,6 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
           mainAxisAlignment: MainAxisAlignment.center,
 
           children: [
-
             Icon(
               icon,
               size: 35,
@@ -625,11 +471,11 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
             Text(
               title,
+
               textAlign: TextAlign.center,
 
               style: const TextStyle(
                 fontSize: 14,
-                fontWeight: FontWeight.normal,
                 color: green,
               ),
             ),
@@ -640,165 +486,11 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
   }
 
   // =========================================================
-  // QUICK ACTION
-  // =========================================================
-
-  Widget _quickAction({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-
-      borderRadius: BorderRadius.circular(12),
-
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: 15,
-          horizontal: 5,
-        ),
-
-        decoration: BoxDecoration(
-          color: Colors.white,
-
-          borderRadius: BorderRadius.circular(12),
-
-          border: Border.all(
-            color: green,
-            width: 0.8,
-          ),
-        ),
-
-        child: Column(
-          children: [
-
-            Icon(
-              icon,
-              color: green,
-              size: 23,
-            ),
-
-            const SizedBox(height: 7),
-
-            Text(
-              title,
-              textAlign: TextAlign.center,
-
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.normal,
-                color: green,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // =========================================================
-  // BOOKINGS PAGE
+  // BOOKINGS BOTTOM NAVIGATION PAGE
   // =========================================================
 
   Widget _bookingsPage() {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: background,
-
-        appBar: AppBar(
-          backgroundColor: green,
-          elevation: 0,
-
-          title: const Text(
-            'Bookings',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 19,
-              fontWeight: FontWeight.normal,
-            ),
-          ),
-        ),
-
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(25),
-
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-
-              children: [
-
-                Icon(
-                  Icons.calendar_month_outlined,
-                  size: 65,
-                  color: green.withOpacity(0.7),
-                ),
-
-                const SizedBox(height: 15),
-
-                const Text(
-                  'All Bookings',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: green,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                const Text(
-                  'Bookings from Rooms, Banquets,\n'
-                  'Restaurants, Conferences, Decorations\n'
-                  'and Health Club will appear here.',
-                  textAlign: TextAlign.center,
-
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.black54,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                OutlinedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Booking data will be loaded from each module collection.',
-                        ),
-                      ),
-                    );
-                  },
-
-                  icon: const Icon(
-                    Icons.refresh,
-                    color: green,
-                  ),
-
-                  label: const Text(
-                    'Refresh',
-                    style: TextStyle(
-                      color: green,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(
-                      color: green,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+    return const ManagerBookingsScreen();
   }
 
   // =========================================================
@@ -819,9 +511,11 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
             style: TextStyle(
               color: Colors.white,
               fontSize: 19,
-              fontWeight: FontWeight.normal,
             ),
           ),
+           iconTheme: const IconThemeData(
+          color: Color(0xFFF5F0E8),
+        ),
         ),
 
         body: Center(
@@ -832,21 +526,20 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
               mainAxisAlignment: MainAxisAlignment.center,
 
               children: [
-
                 Icon(
                   Icons.chat_bubble_outline,
                   size: 65,
-                  color: green.withOpacity(0.7),
+                  color: green.withValues(alpha: 0.7),
                 ),
 
                 const SizedBox(height: 15),
 
                 const Text(
                   'No Messages Available',
+
                   style: TextStyle(
                     fontSize: 19,
                     color: green,
-                    fontWeight: FontWeight.normal,
                   ),
                 ),
 
@@ -855,12 +548,12 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                 const Text(
                   'Messages will appear here when\n'
                   'messaging is added to the system.',
+
                   textAlign: TextAlign.center,
 
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.black54,
-                    fontWeight: FontWeight.normal,
                   ),
                 ),
               ],
@@ -886,12 +579,15 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
           title: const Text(
             'More',
+
             style: TextStyle(
               color: Colors.white,
               fontSize: 19,
-              fontWeight: FontWeight.normal,
             ),
           ),
+           iconTheme: const IconThemeData(
+          color: Color(0xFFF5F0E8),
+        ),
         ),
 
         body: ListView(
@@ -900,41 +596,82 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
           children: [
 
             _moreTile(
-              icon: Icons.local_offer_outlined,
-              title: 'Special Offers',
+              icon: Icons.people_outline,
+              title: 'Manage Customers',
+
               onTap: () {
                 Navigator.push(
                   context,
+
                   MaterialPageRoute(
                     builder: (context) =>
-                        const SpecialOffersScreen(),
+                        const CustomersScreen(),
                   ),
                 );
               },
             ),
 
             _moreTile(
-              icon: Icons.people_outline,
-              title: 'Manage Customers',
-              onTap: () {},
+              icon: Icons.calendar_month_outlined,
+              title: 'Bookings',
+
+              onTap: () {
+                Navigator.push(
+                  context,
+
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const ManagerBookingsScreen(),
+                  ),
+                );
+              },
             ),
 
             _moreTile(
               icon: Icons.payment_outlined,
               title: 'Payments',
-              onTap: () {},
+
+              onTap: () {
+                Navigator.push(
+                  context,
+
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const ManagerPaymentsScreen(),
+                  ),
+                );
+              },
             ),
 
             _moreTile(
               icon: Icons.bar_chart_outlined,
               title: 'Reports',
-              onTap: () {},
+
+              onTap: () {
+                Navigator.push(
+                  context,
+
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const ManagerReportsScreen(),
+                  ),
+                );
+              },
             ),
 
             _moreTile(
               icon: Icons.settings_outlined,
               title: 'Settings',
-              onTap: () {},
+
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Settings will be connected later.',
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -972,10 +709,10 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
         title: Text(
           title,
+
           style: const TextStyle(
             color: green,
             fontSize: 14,
-            fontWeight: FontWeight.normal,
           ),
         ),
 

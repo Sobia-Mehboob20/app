@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'roomscreen.dart';
+import 'banquet_halls_screen.dart';
+import 'special_offers_screen.dart';
 
 class CustomerDashboard extends StatefulWidget {
   const CustomerDashboard({super.key});
@@ -28,12 +31,11 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       // ========================================================
       // APP BAR
       // ========================================================
-
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: background,
+        backgroundColor: olive,
         elevation: 0,
-
+       
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -42,16 +44,13 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: Colors.white,
               ),
             ),
             SizedBox(height: 2),
             Text(
               'Aurelia Grand Hotel',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
         ),
@@ -59,10 +58,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(
-              Icons.notifications_none,
-              color: olive,
-            ),
+            icon: const Icon(Icons.notifications_none, color: olive),
           ),
 
           Padding(
@@ -70,10 +66,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             child: CircleAvatar(
               radius: 19,
               backgroundColor: lightOlive,
-              child: const Icon(
-                Icons.person_outline,
-                color: olive,
-              ),
+              child: const Icon(Icons.person_outline, color: olive),
             ),
           ),
         ],
@@ -82,21 +75,14 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       // ========================================================
       // SCROLLABLE BODY
       // ========================================================
-
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
 
-        padding: const EdgeInsets.fromLTRB(
-          16,
-          5,
-          16,
-          30,
-        ),
+        padding: const EdgeInsets.fromLTRB(16, 5, 16, 30),
 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // ==================================================
             // HOTEL BANNER
             // ==================================================
@@ -106,15 +92,13 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
 
               child: Stack(
                 children: [
-
                   Image.asset(
                     'assets/hotel/hotel_main.jpg',
                     width: double.infinity,
                     height: 180,
                     fit: BoxFit.cover,
 
-                    errorBuilder:
-                        (context, error, stackTrace) {
+                    errorBuilder: (context, error, stackTrace) {
                       return Container(
                         width: double.infinity,
                         height: 180,
@@ -150,8 +134,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                     bottom: 18,
 
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
 
                       children: [
                         Text(
@@ -167,10 +150,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
 
                         Text(
                           'Your Stay, Elevated. ✨',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
-                          ),
+                          style: TextStyle(color: Colors.white70, fontSize: 13),
                         ),
                       ],
                     ),
@@ -184,24 +164,16 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             // ==================================================
             // WELCOME
             // ==================================================
-
             const Text(
               'Explore Aurelia Grand',
-              style: TextStyle(
-                fontSize: 21,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 6),
 
             const Text(
               'Everything you need for a comfortable and memorable stay.',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-                height: 1.4,
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey, height: 1.4),
             ),
 
             const SizedBox(height: 18),
@@ -209,7 +181,6 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             // ==================================================
             // MAIN MODULE GRID
             // ==================================================
-
             GridView.count(
               crossAxisCount: 2,
 
@@ -220,11 +191,9 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
 
               shrinkWrap: true,
 
-              physics:
-                  const NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
 
               children: [
-
                 // =================================================
                 // RESTAURANTS
                 // =================================================
@@ -241,7 +210,6 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 // =================================================
                 // CONFERENCES
                 // =================================================
-
                 serviceCard(
                   icon: Icons.business_outlined,
                   title: 'Conferences',
@@ -254,7 +222,6 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 // =================================================
                 // DECORATIONS
                 // =================================================
-
                 serviceCard(
                   icon: Icons.auto_awesome_outlined,
                   title: 'Decorations',
@@ -267,7 +234,6 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 // =================================================
                 // HEALTH CLUB
                 // =================================================
-
                 serviceCard(
                   icon: Icons.fitness_center_outlined,
                   title: 'Health Club',
@@ -280,7 +246,6 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 // =================================================
                 // OUR STORY
                 // =================================================
-
                 serviceCard(
                   icon: Icons.auto_stories_outlined,
                   title: 'Our Story',
@@ -293,39 +258,51 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 // =================================================
                 // ROOMS - GROUP MEMBER
                 // =================================================
-
                 serviceCard(
                   icon: Icons.hotel_outlined,
                   title: 'Rooms',
                   subtitle: 'Explore Our Rooms',
                   onTap: () {
-                    openPage('/rooms');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RoomsScreen(),
+                      ),
+                    );
                   },
                 ),
 
                 // =================================================
                 // BANQUET HALLS - GROUP MEMBER
                 // =================================================
-
                 serviceCard(
                   icon: Icons.event_outlined,
                   title: 'Banquet Halls',
                   subtitle: 'Events & Celebrations',
                   onTap: () {
-                    openPage('/banquet-halls');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BanquetHallsScreen(),
+                      ),
+                    );
                   },
                 ),
 
                 // =================================================
                 // SPECIAL OFFERS - GROUP MEMBER
                 // =================================================
-
                 serviceCard(
                   icon: Icons.local_offer_outlined,
                   title: 'Special Offers',
                   subtitle: 'Exclusive Deals',
                   onTap: () {
-                    openPage('/special-offers');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SpecialOffersScreen(),
+                      ),
+                    );
                   },
                 ),
               ],
@@ -336,7 +313,6 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             // ==================================================
             // HOTEL HIGHLIGHT
             // ==================================================
-
             Container(
               width: double.infinity,
 
@@ -348,18 +324,12 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
               ),
 
               child: const Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
-
                   Row(
                     children: [
-                      Icon(
-                        Icons.star_outline,
-                        color: olive,
-                        size: 28,
-                      ),
+                      Icon(Icons.star_outline, color: olive, size: 28),
 
                       SizedBox(width: 10),
 
@@ -378,10 +348,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
 
                   Text(
                     'Stay • Dine • Celebrate • Wellness',
-                    style: TextStyle(
-                      fontSize: 14,
-                      height: 1.5,
-                    ),
+                    style: TextStyle(fontSize: 14, height: 1.5),
                   ),
 
                   SizedBox(height: 8),
@@ -405,7 +372,6 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             // ==================================================
             // OUR STORY QUICK LINK
             // ==================================================
-
             InkWell(
               onTap: () {
                 openPage('/our-story');
@@ -420,13 +386,11 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
 
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius:
-                      BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(16),
 
                   boxShadow: [
                     BoxShadow(
-                      color:
-                          Colors.black.withOpacity(0.05),
+                      color: Colors.black.withOpacity(0.05),
                       blurRadius: 7,
                       offset: const Offset(0, 3),
                     ),
@@ -435,14 +399,12 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
 
                 child: Row(
                   children: [
-
                     Container(
                       padding: const EdgeInsets.all(11),
 
                       decoration: BoxDecoration(
                         color: lightOlive,
-                        borderRadius:
-                            BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12),
                       ),
 
                       child: const Icon(
@@ -456,16 +418,14 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
 
                     const Expanded(
                       child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
 
                         children: [
                           Text(
                             'Discover Our Story',
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight:
-                                  FontWeight.bold,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
 
@@ -473,20 +433,13 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
 
                           Text(
                             'Learn more about Aurelia Grand Hotel',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                         ],
                       ),
                     ),
 
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 16,
-                      color: olive,
-                    ),
+                    const Icon(Icons.arrow_forward_ios, size: 16, color: olive),
                   ],
                 ),
               ),
@@ -497,11 +450,9 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             // ==================================================
             // FOOTER
             // ==================================================
-
             const Center(
               child: Column(
                 children: [
-
                   Text(
                     'AURELIA GRAND HOTEL',
                     style: TextStyle(
@@ -516,10 +467,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
 
                   Text(
                     'Your Stay, Elevated. ✨',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: Colors.grey, fontSize: 13),
                   ),
                 ],
               ),
@@ -551,13 +499,11 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
         decoration: BoxDecoration(
           color: Colors.white,
 
-          borderRadius:
-              BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16),
 
           boxShadow: [
             BoxShadow(
-              color:
-                  Colors.black.withOpacity(0.06),
+              color: Colors.black.withOpacity(0.06),
 
               blurRadius: 7,
 
@@ -567,11 +513,9 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
         ),
 
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
 
           children: [
-
             Container(
               padding: const EdgeInsets.all(13),
 
@@ -581,11 +525,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 shape: BoxShape.circle,
               ),
 
-              child: Icon(
-                icon,
-                size: 30,
-                color: olive,
-              ),
+              child: Icon(icon, size: 30, color: olive),
             ),
 
             const SizedBox(height: 10),
@@ -594,10 +534,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
               title,
               textAlign: TextAlign.center,
 
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 4),
@@ -606,10 +543,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
               subtitle,
               textAlign: TextAlign.center,
 
-              style: const TextStyle(
-                fontSize: 11,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 11, color: Colors.grey),
             ),
           ],
         ),
@@ -617,4 +551,3 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
     );
   }
 }
-      

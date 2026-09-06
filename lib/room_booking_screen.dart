@@ -26,10 +26,12 @@ class RoomBookingScreen extends StatefulWidget {
   });
 
   @override
-  State<RoomBookingScreen> createState() => _RoomBookingScreenState();
+  State<RoomBookingScreen> createState() =>
+      _RoomBookingScreenState();
 }
 
-class _RoomBookingScreenState extends State<RoomBookingScreen> {
+class _RoomBookingScreenState
+    extends State<RoomBookingScreen> {
   bool isBooking = false;
 
   // ---------------- FORMAT DATE ----------------
@@ -41,7 +43,11 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
   // ---------------- CALCULATE NIGHTS ----------------
 
   int get numberOfNights {
-    return widget.checkOutDate.difference(widget.checkInDate).inDays;
+    final nights = widget.checkOutDate
+        .difference(widget.checkInDate)
+        .inDays;
+
+    return nights > 0 ? nights : 1;
   }
 
   // ---------------- GET PRICE ----------------
@@ -73,38 +79,104 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
     try {
       await FirebaseFirestore.instance
-          .collection('roomBookings')
+          .collection('bookings')
           .add({
+        // ---------------- HOTEL INFORMATION ----------------
+
+        'hotelName': 'Aurelia Grand',
+        'bookingType': 'Room',
+
+        // ---------------- ROOM INFORMATION ----------------
+
         'roomId': widget.roomId,
-        'roomName': widget.roomName,
-        'checkIn': Timestamp.fromDate(widget.checkInDate),
-        'checkOut': Timestamp.fromDate(widget.checkOutDate),
+        'roomType': widget.roomName,
+
+        // ---------------- DATES ----------------
+
+        'checkIn':
+            Timestamp.fromDate(widget.checkInDate),
+
+        'checkOut':
+            Timestamp.fromDate(widget.checkOutDate),
+
+        // ---------------- GUESTS ----------------
+
         'adults': widget.adults,
         'children': widget.children,
-        'numberOfNights': numberOfNights,
+
+        // ---------------- STAY INFORMATION ----------------
+
+        'nights': numberOfNights,
+
+        // ---------------- PRICE INFORMATION ----------------
+
         'pricePerNight': priceNumber,
-        'totalPrice': totalPrice,
+        'totalAmount': totalPrice,
 
-        // Booking will remain Pending
-        // until receptionist confirms it
-        'status': 'Pending',
+        // ---------------- PAYMENT INFORMATION ----------------
 
-        'createdAt': FieldValue.serverTimestamp(),
+        'paymentMethod': 'Not Paid',
+        'paymentStatus': 'Pending',
+
+        // ---------------- BOOKING STATUS ----------------
+        // Customer submits the booking as Pending.
+        // Receptionist will confirm it later.
+
+        'bookingStatus': 'Pending',
+
+        // ---------------- CREATED TIME ----------------
+
+        'createdAt':
+            FieldValue.serverTimestamp(),
       });
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Booking request submitted. Waiting for confirmation.',
-          ),
-        ),
-      );
-
       setState(() {
         isBooking = false;
       });
+
+      // ---------------- SUCCESS MESSAGE ----------------
+
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor:
+                const Color(0xFFF5F0E8),
+
+            title: const Text(
+              'Booking Submitted',
+              style: TextStyle(
+                color: Color(0xFF3F4A32),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            content: const Text(
+              'Your room booking request has been '
+              'submitted successfully. Your booking is '
+              'currently Pending and will be confirmed '
+              'by the receptionist.',
+            ),
+
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  'OK',
+                  style: TextStyle(
+                    color: Color(0xFF3F4A32),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
     } catch (e) {
       if (!mounted) return;
 
@@ -114,21 +186,30 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Booking failed: $e'),
+          content: Text(
+            'Booking failed: $e',
+          ),
         ),
       );
     }
   }
 
+  // =====================================================
+  // BUILD
+  // =====================================================
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F0E8),
+      backgroundColor:
+          const Color(0xFFF5F0E8),
 
       // ---------------- APP BAR ----------------
 
       appBar: AppBar(
-        backgroundColor: const Color(0xFF3F4A32),
+        backgroundColor:
+            const Color(0xFF3F4A32),
+
         elevation: 0,
 
         leading: const BackButton(
@@ -151,13 +232,15 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
         padding: const EdgeInsets.all(20),
 
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
 
           children: [
-            // ROOM IMAGE
+            // ---------------- ROOM IMAGE ----------------
 
             ClipRRect(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius:
+                  BorderRadius.circular(15),
 
               child: Image.asset(
                 widget.image,
@@ -169,7 +252,7 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
             const SizedBox(height: 20),
 
-            // ROOM NAME
+            // ---------------- ROOM NAME ----------------
 
             Text(
               widget.roomName,
@@ -183,20 +266,27 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
             const SizedBox(height: 20),
 
-            // ================= BOOKING INFORMATION =================
+            // =================================================
+            // BOOKING INFORMATION
+            // =================================================
 
             Container(
               width: double.infinity,
 
-              padding: const EdgeInsets.all(18),
+              padding:
+                  const EdgeInsets.all(18),
 
               decoration: BoxDecoration(
-                color: const Color(0xFFFAF8F3),
-                borderRadius: BorderRadius.circular(15),
+                color:
+                    const Color(0xFFFAF8F3),
+
+                borderRadius:
+                    BorderRadius.circular(15),
               ),
 
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
 
                 children: [
                   const Text(
@@ -204,8 +294,10 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
                     style: TextStyle(
                       fontSize: 19,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF3F4A32),
+                      fontWeight:
+                          FontWeight.bold,
+                      color:
+                          Color(0xFF3F4A32),
                     ),
                   ),
 
@@ -215,7 +307,8 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
                   Row(
                     mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                        MainAxisAlignment
+                            .spaceBetween,
 
                     children: [
                       const Text(
@@ -226,10 +319,14 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
                       ),
 
                       Text(
-                        formatDate(widget.checkInDate),
+                        formatDate(
+                          widget.checkInDate,
+                        ),
 
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                        style:
+                            const TextStyle(
+                          fontWeight:
+                              FontWeight.bold,
                         ),
                       ),
                     ],
@@ -241,7 +338,8 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
                   Row(
                     mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                        MainAxisAlignment
+                            .spaceBetween,
 
                     children: [
                       const Text(
@@ -252,10 +350,14 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
                       ),
 
                       Text(
-                        formatDate(widget.checkOutDate),
+                        formatDate(
+                          widget.checkOutDate,
+                        ),
 
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                        style:
+                            const TextStyle(
+                          fontWeight:
+                              FontWeight.bold,
                         ),
                       ),
                     ],
@@ -267,7 +369,8 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
                   Row(
                     mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                        MainAxisAlignment
+                            .spaceBetween,
 
                     children: [
                       const Text(
@@ -281,8 +384,10 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
                         '${widget.adults} Adults, '
                         '${widget.children} Children',
 
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                        style:
+                            const TextStyle(
+                          fontWeight:
+                              FontWeight.bold,
                         ),
                       ),
                     ],
@@ -294,7 +399,8 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
                   Row(
                     mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                        MainAxisAlignment
+                            .spaceBetween,
 
                     children: [
                       const Text(
@@ -307,8 +413,10 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
                       Text(
                         '$numberOfNights',
 
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                        style:
+                            const TextStyle(
+                          fontWeight:
+                              FontWeight.bold,
                         ),
                       ),
                     ],
@@ -319,16 +427,22 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
             const SizedBox(height: 20),
 
-            // ================= PRICE SUMMARY =================
+            // =================================================
+            // PRICE SUMMARY
+            // =================================================
 
             Container(
               width: double.infinity,
 
-              padding: const EdgeInsets.all(18),
+              padding:
+                  const EdgeInsets.all(18),
 
               decoration: BoxDecoration(
-                color: const Color(0xFFFAF8F3),
-                borderRadius: BorderRadius.circular(15),
+                color:
+                    const Color(0xFFFAF8F3),
+
+                borderRadius:
+                    BorderRadius.circular(15),
               ),
 
               child: Column(
@@ -341,16 +455,21 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
                     style: TextStyle(
                       fontSize: 19,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF3F4A32),
+                      fontWeight:
+                          FontWeight.bold,
+                      color:
+                          Color(0xFF3F4A32),
                     ),
                   ),
 
                   const SizedBox(height: 18),
 
+                  // ROOM PRICE
+
                   Row(
                     mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                        MainAxisAlignment
+                            .spaceBetween,
 
                     children: [
                       const Text(
@@ -368,9 +487,12 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
                   const SizedBox(height: 10),
 
+                  // NIGHTS
+
                   Row(
                     mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                        MainAxisAlignment
+                            .spaceBetween,
 
                     children: [
                       const Text(
@@ -386,11 +508,16 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
                     ],
                   ),
 
-                  const Divider(height: 25),
+                  const Divider(
+                    height: 25,
+                  ),
+
+                  // TOTAL
 
                   Row(
                     mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                        MainAxisAlignment
+                            .spaceBetween,
 
                     children: [
                       const Text(
@@ -398,17 +525,21 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
 
                         style: TextStyle(
                           fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontWeight:
+                              FontWeight.bold,
                         ),
                       ),
 
                       Text(
                         'PKR ${totalPrice.toStringAsFixed(0)}',
 
-                        style: const TextStyle(
+                        style:
+                            const TextStyle(
                           fontSize: 19,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF3F4A32),
+                          fontWeight:
+                              FontWeight.bold,
+                          color:
+                              Color(0xFF3F4A32),
                         ),
                       ),
                     ],
@@ -417,22 +548,76 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
 
-            // ================= CONFIRM BOOKING =================
+            // =================================================
+            // BOOKING STATUS
+            // =================================================
+
+            Container(
+              width: double.infinity,
+
+              padding:
+                  const EdgeInsets.all(15),
+
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+
+                borderRadius:
+                    BorderRadius.circular(12),
+
+                border: Border.all(
+                  color:
+                      Colors.orange.shade300,
+                ),
+              ),
+
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.pending_actions,
+                    color:
+                        Colors.orange.shade800,
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  const Expanded(
+                    child: Text(
+                      'Booking Status: Pending\n'
+                      'The receptionist will confirm your booking.',
+                      style: TextStyle(
+                        fontWeight:
+                            FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            // =================================================
+            // SUBMIT BOOKING BUTTON
+            // =================================================
 
             SizedBox(
               width: double.infinity,
 
               child: ElevatedButton(
-                onPressed:
-                    isBooking ? null : confirmBooking,
+                onPressed: isBooking
+                    ? null
+                    : confirmBooking,
 
-                style: ElevatedButton.styleFrom(
+                style:
+                    ElevatedButton.styleFrom(
                   backgroundColor:
                       const Color(0xFF5A6545),
 
-                  foregroundColor: Colors.white,
+                  foregroundColor:
+                      Colors.white,
 
                   padding:
                       const EdgeInsets.symmetric(
@@ -458,11 +643,12 @@ class _RoomBookingScreenState extends State<RoomBookingScreen> {
                         ),
                       )
                     : const Text(
-                        'Confirm Booking',
+                        'Submit Booking',
 
                         style: TextStyle(
                           fontSize: 17,
-                          fontWeight: FontWeight.bold,
+                          fontWeight:
+                              FontWeight.bold,
                         ),
                       ),
               ),

@@ -28,11 +28,15 @@ class EventBookingScreen extends StatefulWidget {
   });
 
   @override
-  State<EventBookingScreen> createState() => _EventBookingScreenState();
+  State<EventBookingScreen> createState() =>
+      _EventBookingScreenState();
 }
 
-class _EventBookingScreenState extends State<EventBookingScreen> {
+class _EventBookingScreenState
+    extends State<EventBookingScreen> {
   bool isSaving = false;
+
+  // ---------------- FORMATTED DATE ----------------
 
   String get formattedDate {
     return '${widget.eventDate.day}/'
@@ -71,7 +75,10 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
   }
 
   double get totalPrice {
-    return hallPrice + decorationPrice + stagePrice + soundPrice;
+    return hallPrice +
+        decorationPrice +
+        stagePrice +
+        soundPrice;
   }
 
   // ---------------- SAVE BOOKING ----------------
@@ -82,27 +89,57 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
     });
 
     try {
-      await FirebaseFirestore.instance.collection('hallBookings').add({
+      await FirebaseFirestore.instance
+          .collection('bookings')
+          .add({
+        // ---------------- COMMON BOOKING INFORMATION ----------------
+
+        'bookingType': 'Event',
+        'hotelName': 'Aurelia Grand',
+
+        // Manager / Receptionist compatibility
+        'roomType': widget.hallName,
+        'checkIn': Timestamp.fromDate(widget.eventDate),
+        'checkOut': Timestamp.fromDate(widget.eventDate),
+        'nights': 1,
+
+        // ---------------- EVENT INFORMATION ----------------
+
         'hallName': widget.hallName,
         'capacity': widget.capacity,
-        'eventDate': Timestamp.fromDate(widget.eventDate),
+        'eventDate':
+            Timestamp.fromDate(widget.eventDate),
         'eventType': widget.eventType,
         'guests': widget.guests,
         'seating': widget.seating,
         'decoration': widget.decoration,
         'stageRequired': widget.stageRequired,
-        'soundSystemRequired': widget.soundSystemRequired,
+        'soundSystemRequired':
+            widget.soundSystemRequired,
+
+        // ---------------- PRICE INFORMATION ----------------
 
         'hallPrice': hallPrice,
         'decorationPrice': decorationPrice,
         'stagePrice': stagePrice,
         'soundPrice': soundPrice,
-        'totalPrice': totalPrice,
+        'totalAmount': totalPrice,
 
-        // Customer booking starts as Pending
-        'status': 'Pending',
+        // ---------------- PAYMENT INFORMATION ----------------
 
-        'createdAt': FieldValue.serverTimestamp(),
+        'paymentMethod': 'Not Paid',
+        'paymentStatus': 'Pending',
+
+        // ---------------- BOOKING STATUS ----------------
+        // Customer submits booking as Pending.
+        // Receptionist will change it to Confirmed.
+
+        'bookingStatus': 'Pending',
+
+        // ---------------- CREATED TIME ----------------
+
+        'createdAt':
+            FieldValue.serverTimestamp(),
       });
 
       if (!mounted) return;
@@ -117,7 +154,8 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            backgroundColor: const Color(0xFFF5F0E8),
+            backgroundColor:
+                const Color(0xFFF5F0E8),
 
             title: const Text(
               'Booking Submitted',
@@ -129,8 +167,9 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
 
             content: const Text(
               'Your event booking request has been '
-              'submitted successfully. It is currently Pending '
-              'and will be confirmed by the receptionist.',
+              'submitted successfully. Your booking is '
+              'currently Pending and will be confirmed '
+              'by the receptionist.',
             ),
 
             actions: [
@@ -159,19 +198,26 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Booking failed: $error'),
+          content:
+              Text('Booking failed: $error'),
         ),
       );
     }
   }
 
+  // ---------------- BUILD ----------------
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F0E8),
+      backgroundColor:
+          const Color(0xFFF5F0E8),
+
+      // ---------------- APP BAR ----------------
 
       appBar: AppBar(
-        backgroundColor: const Color(0xFF3F4A32),
+        backgroundColor:
+            const Color(0xFF3F4A32),
         elevation: 0,
 
         title: const Text(
@@ -187,13 +233,18 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
         ),
       ),
 
+      // ---------------- BODY ----------------
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
 
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
 
           children: [
+            // ---------------- BOOKING SUMMARY ----------------
+
             const Text(
               'Booking Summary',
               style: TextStyle(
@@ -204,8 +255,6 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
             ),
 
             const SizedBox(height: 20),
-
-            // ---------------- BOOKING INFORMATION ----------------
 
             _infoCard(
               children: [
@@ -305,8 +354,10 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
                       'Total',
                       style: TextStyle(
                         fontSize: 19,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF3F4A32),
+                        fontWeight:
+                            FontWeight.bold,
+                        color:
+                            Color(0xFF3F4A32),
                       ),
                     ),
 
@@ -314,8 +365,10 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
                       'PKR ${totalPrice.toStringAsFixed(0)}',
                       style: const TextStyle(
                         fontSize: 19,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF3F4A32),
+                        fontWeight:
+                            FontWeight.bold,
+                        color:
+                            Color(0xFF3F4A32),
                       ),
                     ),
                   ],
@@ -325,25 +378,73 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
 
             const SizedBox(height: 35),
 
+            // ---------------- BOOKING STATUS ----------------
+
+            Container(
+              width: double.infinity,
+              padding:
+                  const EdgeInsets.all(15),
+
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius:
+                    BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.orange.shade300,
+                ),
+              ),
+
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.pending_actions,
+                    color:
+                        Colors.orange.shade800,
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  const Expanded(
+                    child: Text(
+                      'Booking Status: Pending\n'
+                      'The receptionist will confirm your booking.',
+                      style: TextStyle(
+                        fontWeight:
+                            FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
             // ---------------- CONFIRM BUTTON ----------------
 
             SizedBox(
               width: double.infinity,
 
               child: ElevatedButton(
-                onPressed: isSaving ? null : saveBooking,
+                onPressed:
+                    isSaving ? null : saveBooking,
 
-                style: ElevatedButton.styleFrom(
+                style:
+                    ElevatedButton.styleFrom(
                   backgroundColor:
                       const Color(0xFF3F4A32),
 
-                  foregroundColor: Colors.white,
+                  foregroundColor:
+                      Colors.white,
 
-                  padding: const EdgeInsets.symmetric(
+                  padding:
+                      const EdgeInsets.symmetric(
                     vertical: 16,
                   ),
 
-                  shape: RoundedRectangleBorder(
+                  shape:
+                      RoundedRectangleBorder(
                     borderRadius:
                         BorderRadius.circular(12),
                   ),
@@ -354,16 +455,18 @@ class _EventBookingScreenState extends State<EventBookingScreen> {
                         height: 22,
                         width: 22,
 
-                        child: CircularProgressIndicator(
+                        child:
+                            CircularProgressIndicator(
                           color: Colors.white,
                           strokeWidth: 2,
                         ),
                       )
                     : const Text(
-                        'Confirm Booking',
+                        'Submit Booking',
                         style: TextStyle(
                           fontSize: 17,
-                          fontWeight: FontWeight.bold,
+                          fontWeight:
+                              FontWeight.bold,
                         ),
                       ),
               ),

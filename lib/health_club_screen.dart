@@ -16,6 +16,9 @@ class HealthClubScreen extends StatelessWidget {
         ),
         backgroundColor: olive,
         foregroundColor: Colors.white,
+         iconTheme: const IconThemeData(
+          color: Color(0xFFF5F0E8),
+        ),
       ),
 
       body: SingleChildScrollView(

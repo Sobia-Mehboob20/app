@@ -1,10 +1,7 @@
-
 import 'package:app/customer_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'manager_dashboard.dart';
 
 class Signin extends StatefulWidget {
   final String role;
@@ -27,6 +24,7 @@ class _SigninState extends State<Signin> {
   final TextEditingController confirmpassword = TextEditingController();
 
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   bool _isLoading = false;
 
   @override
@@ -48,44 +46,63 @@ class _SigninState extends State<Signin> {
     });
 
     try {
+      // Create Firebase Authentication account
       UserCredential userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email.text.trim(),
         password: password.text.trim(),
       );
 
-      String uid = userCredential.user!.uid;
+      final User? user = userCredential.user;
 
+      if (user == null) {
+        throw Exception("User account could not be created.");
+      }
+
+      final String uid = user.uid;
+
+      // Save customer information in Firestore
       await FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
           .set({
+        'uid': uid,
         'name': name.text.trim(),
         'email': email.text.trim(),
-        'role': widget.role,
+        'role': 'customer',
+        'createdAt': FieldValue.serverTimestamp(),
       });
 
-      print("Account Created");
-      print("Role: ${widget.role}");
+      debugPrint("Account Created Successfully");
+      debugPrint("Customer UID: $uid");
+      debugPrint("Role: customer");
 
       if (!mounted) return;
 
-      // Manager → Manager Dashboard
-      if (widget.role == "customer") {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const CustomerDashboard(),
-          ),
-          (route) => false,
-        );
-      }
+      // Customer -> Customer Dashboard
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CustomerDashboard(),
+        ),
+        (route) => false,
+      );
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
 
+      String message = "Account creation failed.";
+
+      if (e.code == 'email-already-in-use') {
+        message = "This email is already registered.";
+      } else if (e.code == 'weak-password') {
+        message = "Password is too weak.";
+      } else if (e.code == 'invalid-email') {
+        message = "Please enter a valid email address.";
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(e.message ?? "Account creation failed."),
+          content: Text(message),
         ),
       );
     } catch (e) {
@@ -107,19 +124,22 @@ class _SigninState extends State<Signin> {
 
   @override
   Widget build(BuildContext context) {
-   return Scaffold(
-  backgroundColor: const Color(0xFFF5F0E8),
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F0E8),
 
-  appBar: AppBar(
-    backgroundColor: const Color(0xFFF5F0E8),
-    elevation: 0,
-    leading: IconButton(
-      icon: const Icon(Icons.arrow_back),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    ),
-  ),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF5F0E8),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
 
       body: SafeArea(
         child: Center(
@@ -132,6 +152,8 @@ class _SigninState extends State<Signin> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+
+                  // TITLE
                   const Text(
                     "Welcome Here",
                     textAlign: TextAlign.center,
@@ -143,10 +165,10 @@ class _SigninState extends State<Signin> {
 
                   const SizedBox(height: 10),
 
-                  Text(
-                    "Create a ${widget.role} account",
+                  const Text(
+                    "Create your customer account",
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey,
                     ),
@@ -160,13 +182,16 @@ class _SigninState extends State<Signin> {
                     decoration: InputDecoration(
                       labelText: "Name",
                       hintText: "Enter your name",
-                      prefixIcon: const Icon(Icons.person_outline),
+                      prefixIcon: const Icon(
+                        Icons.person_outline,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
+                      if (value == null ||
+                          value.trim().isEmpty) {
                         return "Please enter your name";
                       }
 
@@ -187,20 +212,25 @@ class _SigninState extends State<Signin> {
                     decoration: InputDecoration(
                       labelText: "Email",
                       hintText: "Enter your email",
-                      prefixIcon: const Icon(Icons.email_outlined),
+                      prefixIcon: const Icon(
+                        Icons.email_outlined,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
+                      if (value == null ||
+                          value.trim().isEmpty) {
                         return "Please enter your email";
                       }
 
                       final emailPattern =
                           RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
-                      if (!emailPattern.hasMatch(value.trim())) {
+                      if (!emailPattern.hasMatch(
+                        value.trim(),
+                      )) {
                         return "Please enter a valid email";
                       }
 
@@ -217,8 +247,9 @@ class _SigninState extends State<Signin> {
                     decoration: InputDecoration(
                       labelText: "Password",
                       hintText: "Enter your password",
-                      prefixIcon: const Icon(Icons.lock_outline),
-
+                      prefixIcon: const Icon(
+                        Icons.lock_outline,
+                      ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword
@@ -227,11 +258,11 @@ class _SigninState extends State<Signin> {
                         ),
                         onPressed: () {
                           setState(() {
-                            _obscurePassword = !_obscurePassword;
+                            _obscurePassword =
+                                !_obscurePassword;
                           });
                         },
                       ),
-
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -254,11 +285,26 @@ class _SigninState extends State<Signin> {
                   // CONFIRM PASSWORD
                   TextFormField(
                     controller: confirmpassword,
-                    obscureText: true,
+                    obscureText: _obscureConfirmPassword,
                     decoration: InputDecoration(
                       labelText: "Confirm Password",
                       hintText: "Re-enter your password",
-                      prefixIcon: const Icon(Icons.lock_outline),
+                      prefixIcon: const Icon(
+                        Icons.lock_outline,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureConfirmPassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureConfirmPassword =
+                                !_obscureConfirmPassword;
+                          });
+                        },
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -282,13 +328,17 @@ class _SigninState extends State<Signin> {
                   SizedBox(
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : createAccount,
+                      onPressed:
+                          _isLoading ? null : createAccount,
 
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3F4A32),
-                        foregroundColor: const Color(0xFFF5F0E8),
+                        backgroundColor:
+                            const Color(0xFF3F4A32),
+                        foregroundColor:
+                            const Color(0xFFF5F0E8),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius:
+                              BorderRadius.circular(12),
                         ),
                       ),
 
@@ -296,8 +346,10 @@ class _SigninState extends State<Signin> {
                           ? const SizedBox(
                               height: 22,
                               width: 22,
-                              child: CircularProgressIndicator(
+                              child:
+                                  CircularProgressIndicator(
                                 strokeWidth: 2,
+                                color: Colors.white,
                               ),
                             )
                           : const Text(
