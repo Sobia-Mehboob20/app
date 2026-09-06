@@ -16,21 +16,32 @@ class Loginscreen extends StatefulWidget {
 class _LoginscreenState extends State<Loginscreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F0E8),
+   return Scaffold(
+  backgroundColor: const Color(0xFFF5F0E8),
+
+  appBar: AppBar(
+    backgroundColor: const Color(0xFFF5F0E8),
+    elevation: 0,
+    leading: IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    ),
+  ),
 
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28),
+            padding: const EdgeInsets.symmetric(horizontal: 22),
 
             child: Column(
               children: [
-                const SizedBox(height: 35),
+                
 
                 // Logo / App Name
                 const Text(
-                  "LUXORA",
+                  "AURELIA GRAND",
                   style: TextStyle(
                     fontSize: 18,
                     letterSpacing: 5,
@@ -39,7 +50,7 @@ class _LoginscreenState extends State<Loginscreen> {
                   ),
                 ),
 
-                const SizedBox(height: 35),
+                const SizedBox(height: 5),
 
                 // Main Heading
                 const Text(
@@ -53,7 +64,7 @@ class _LoginscreenState extends State<Loginscreen> {
                   ),
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
 
                 const Text(
                   "Experience comfort, luxury\nand excellence.",
@@ -65,7 +76,7 @@ class _LoginscreenState extends State<Loginscreen> {
                   ),
                 ),
 
-                const SizedBox(height: 28),
+                const SizedBox(height:10),
 
                 // Image
                 ClipRRect(
@@ -74,7 +85,7 @@ class _LoginscreenState extends State<Loginscreen> {
                   child: Image.network(
                     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaHDSYYDJWkxicmMcE0gqpNvgSS91sNvsjiqleC3tYnfYfMb33CDkoaBcu&s=10",
                     width: double.infinity,
-                    height: 300,
+                    height: 250,
                     fit: BoxFit.cover,
 
                     loadingBuilder: (context, child, loadingProgress) {
@@ -105,7 +116,7 @@ class _LoginscreenState extends State<Loginscreen> {
                 ),
 
                 //const Spacer(),
-                const SizedBox(height: 25),
+                const SizedBox(height:20),
 
                 // Login Button
                 SizedBox(
@@ -123,9 +134,6 @@ class _LoginscreenState extends State<Loginscreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF3F4A32),
                       foregroundColor: Color(0xFFF5F0E8),
-
-                      elevation: 0,
-
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -176,14 +184,14 @@ class _LoginscreenState extends State<Loginscreen> {
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 10),
 
                 // Bottom text
                 const Text(
                   "Your comfort, our priority.",
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.black45,
+                    color: Color.fromARGB(255, 156, 158, 153),
                     letterSpacing: 0.5,
                   ),
                 ),
