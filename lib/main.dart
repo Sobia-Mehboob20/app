@@ -1,21 +1,31 @@
 import 'dart:async';
-import 'package:app/loginScreen.dart';
-import 'package:app/receptionist.dart';
-import 'package:app/role.dart';
-import 'package:app/receptionist.dart';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'firebase_options.dart';
+import 'loginScreen.dart';
+import 'receptionist.dart';
+import 'role.dart';
 import 'roomscreen.dart';
 import 'banquet_halls_screen.dart';
 import 'special_offers_screen.dart';
 import 'manager_dashboard.dart';
 
+import 'our_story_screen.dart';
+import 'restaurants_screen.dart';
+import 'official_conferences.dart';
+import 'decorations_screen.dart';
+import 'health_club_screen.dart';
+import 'customer_dashboard.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(const AureliaGrandApp());
 }
@@ -27,13 +37,37 @@ class AureliaGrandApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Aurelia Grand',
+      title: 'Aurelia Grand Hotel',
+
       theme: ThemeData(
         useMaterial3: true,
-        scaffoldBackgroundColor: Color(0xFF3F4A32),
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF5A6545)),
+        scaffoldBackgroundColor: const Color(0xFFF5F0E8),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF5A6545),
+        ),
       ),
+
       home: const SplashScreen(),
+
+      routes: {
+        '/customer-dashboard': (context) =>
+            const CustomerDashboard(),
+
+        '/our-story': (context) =>
+            const OurStoryScreen(),
+
+        '/restaurants': (context) =>
+            const RestaurantsScreen(),
+
+        '/official-conferences': (context) =>
+            const OfficialConferences(),
+
+        '/decorations': (context) =>
+            const DecorationsScreen(),
+
+        '/health-club': (context) =>
+            const HealthClubScreen(),
+      },
     );
   }
 }
@@ -51,8 +85,14 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     Timer(const Duration(seconds: 3), () {
-      Navigator.push(context, MaterialPageRoute(builder: (context) =>Role()
-      ));
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const Role(),
+        ),
+      );
     });
   }
 
@@ -62,17 +102,21 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: const Color(0xFFF5F0E8),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Center(child: 
-          Image.asset(
-  'assets/images/logo.jpg',
-  width: 200,
-),),
+          Center(
+            child: Image.asset(
+              'assets/images/logo.jpg',
+              width: 200,
+            ),
+          ),
           const SizedBox(height: 30),
           const Text(
             "AURELIA HOTEL",
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold ,color:const Color(0xFF5A6545),),
+            style: TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF5A6545),
+            ),
           ),
         ],
       ),
@@ -118,7 +162,10 @@ class TemporaryHomeScreen extends StatelessWidget {
               const Text(
                 'Hotel • Events • Dining • Wellness',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black87, fontSize: 15),
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 15,
+                ),
               ),
               const SizedBox(height: 35),
 
@@ -129,20 +176,13 @@ class TemporaryHomeScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const RoomsScreen(),
+                        builder: (context) =>
+                            const RoomsScreen(),
                       ),
                     );
                   },
                   icon: const Icon(Icons.hotel),
-                  label: const Text(
-                    'Rooms',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3F4A32),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                  ),
+                  label: const Text('Rooms'),
                 ),
               ),
 
@@ -155,20 +195,13 @@ class TemporaryHomeScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const BanquetHallsScreen(),
+                        builder: (context) =>
+                            const BanquetHallsScreen(),
                       ),
                     );
                   },
                   icon: const Icon(Icons.celebration),
-                  label: const Text(
-                    'Banquet Halls',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3F4A32),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                  ),
+                  label: const Text('Banquet Halls'),
                 ),
               ),
 
@@ -181,20 +214,13 @@ class TemporaryHomeScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const SpecialOffersScreen(),
+                        builder: (context) =>
+                            const SpecialOffersScreen(),
                       ),
                     );
                   },
                   icon: const Icon(Icons.local_offer),
-                  label: const Text(
-                    'Special Offers',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3F4A32),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                  ),
+                  label: const Text('Special Offers'),
                 ),
               ),
             ],
@@ -211,20 +237,32 @@ class RoomScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Hotel Rooms')),
+      appBar: AppBar(
+        title: const Text('Hotel Rooms'),
+      ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('rooms').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('rooms')
+            .snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+          if (snapshot.connectionState ==
+              ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
           }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No rooms found'));
+          if (!snapshot.hasData ||
+              snapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text('No rooms found'),
+            );
           }
 
           final rooms = snapshot.data!.docs;
@@ -237,8 +275,13 @@ class RoomScreen extends StatelessWidget {
               return Card(
                 margin: const EdgeInsets.all(10),
                 child: ListTile(
-                  leading: const Icon(Icons.hotel, size: 35),
-                  title: Text('Room ${room['roomNumber']}'),
+                  leading: const Icon(
+                    Icons.hotel,
+                    size: 35,
+                  ),
+                  title: Text(
+                    'Room ${room['roomNumber']}',
+                  ),
                   subtitle: Text(
                     'Type: ${room['type']}\n'
                     'Price: ${room['price']}\n'
