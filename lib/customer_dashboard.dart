@@ -32,10 +32,12 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       // APP BAR
       // ========================================================
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        
         backgroundColor: olive,
         elevation: 0,
-       
+       iconTheme: const IconThemeData(
+  color: Colors.white,
+),
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -92,27 +94,26 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
 
               child: Stack(
                 children: [
-                  Image.asset(
-                    'assets/hotel/hotel_main.jpg',
-                    width: double.infinity,
-                    height: 180,
-                    fit: BoxFit.cover,
-
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: double.infinity,
-                        height: 180,
-                        color: olive,
-                        child: const Center(
-                          child: Icon(
-                            Icons.hotel,
-                            size: 65,
-                            color: Colors.white,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                  Image.network(
+  'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
+  width: double.infinity,
+  height: 180,
+  fit: BoxFit.cover,
+  errorBuilder: (context, error, stackTrace) {
+    return Container(
+      width: double.infinity,
+      height: 180,
+      color: olive,
+      child: const Center(
+        child: Icon(
+          Icons.hotel,
+          size: 65,
+          color: Colors.white,
+        ),
+      ),
+    );
+  },
+),
 
                   Positioned.fill(
                     child: Container(
@@ -182,131 +183,131 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             // MAIN MODULE GRID
             // ==================================================
             GridView.count(
-              crossAxisCount: 2,
+  crossAxisCount: 2,
 
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+  crossAxisSpacing: 12,
+  mainAxisSpacing: 12,
 
-              childAspectRatio: 1.18,
+  childAspectRatio: 1.18,
 
-              shrinkWrap: true,
+  shrinkWrap: true,
 
-              physics: const NeverScrollableScrollPhysics(),
+  physics: const NeverScrollableScrollPhysics(),
 
-              children: [
-                // =================================================
-                // RESTAURANTS
-                // =================================================
+  children: [
 
-                serviceCard(
-                  icon: Icons.restaurant_outlined,
-                  title: 'Restaurants',
-                  subtitle: 'Explore Dining',
-                  onTap: () {
-                    openPage('/restaurants');
-                  },
-                ),
+    // =================================================
+    // 1. ROOMS
+    // =================================================
+    serviceCard(
+      icon: Icons.hotel_outlined,
+      title: 'Rooms',
+      subtitle: 'Explore Our Rooms',
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const RoomsScreen(),
+          ),
+        );
+      },
+    ),
 
-                // =================================================
-                // CONFERENCES
-                // =================================================
-                serviceCard(
-                  icon: Icons.business_outlined,
-                  title: 'Conferences',
-                  subtitle: 'Official Events',
-                  onTap: () {
-                    openPage('/official-conferences');
-                  },
-                ),
+    // =================================================
+    // 2. BANQUET HALLS
+    // =================================================
+    serviceCard(
+      icon: Icons.event_outlined,
+      title: 'Banquet Halls',
+      subtitle: 'Events & Celebrations',
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const BanquetHallsScreen(),
+          ),
+        );
+      },
+    ),
 
-                // =================================================
-                // DECORATIONS
-                // =================================================
-                serviceCard(
-                  icon: Icons.auto_awesome_outlined,
-                  title: 'Decorations',
-                  subtitle: 'Special Occasions',
-                  onTap: () {
-                    openPage('/decorations');
-                  },
-                ),
+    // =================================================
+    // 3. CONFERENCES
+    // =================================================
+    serviceCard(
+      icon: Icons.business_outlined,
+      title: 'Conferences',
+      subtitle: 'Official Events',
+      onTap: () {
+        openPage('/official-conferences');
+      },
+    ),
 
-                // =================================================
-                // HEALTH CLUB
-                // =================================================
-                serviceCard(
-                  icon: Icons.fitness_center_outlined,
-                  title: 'Health Club',
-                  subtitle: 'Fitness & Wellness',
-                  onTap: () {
-                    openPage('/health-club');
-                  },
-                ),
+    // =================================================
+    // 4. DECORATIONS
+    // =================================================
+    serviceCard(
+      icon: Icons.auto_awesome_outlined,
+      title: 'Decorations',
+      subtitle: 'Special Occasions',
+      onTap: () {
+        openPage('/decorations');
+      },
+    ),
 
-                // =================================================
-                // OUR STORY
-                // =================================================
-                serviceCard(
-                  icon: Icons.auto_stories_outlined,
-                  title: 'Our Story',
-                  subtitle: 'Discover Our Hotel',
-                  onTap: () {
-                    openPage('/our-story');
-                  },
-                ),
+    // =================================================
+    // 5. SPECIAL OFFERS
+    // =================================================
+    serviceCard(
+      icon: Icons.local_offer_outlined,
+      title: 'Special Offers',
+      subtitle: 'Exclusive Deals',
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const SpecialOffersScreen(),
+          ),
+        );
+      },
+    ),
 
-                // =================================================
-                // ROOMS - GROUP MEMBER
-                // =================================================
-                serviceCard(
-                  icon: Icons.hotel_outlined,
-                  title: 'Rooms',
-                  subtitle: 'Explore Our Rooms',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const RoomsScreen(),
-                      ),
-                    );
-                  },
-                ),
+    // =================================================
+    // 6. RESTAURANTS
+    // =================================================
+    serviceCard(
+      icon: Icons.restaurant_outlined,
+      title: 'Restaurants',
+      subtitle: 'Explore Dining',
+      onTap: () {
+        openPage('/restaurants');
+      },
+    ),
 
-                // =================================================
-                // BANQUET HALLS - GROUP MEMBER
-                // =================================================
-                serviceCard(
-                  icon: Icons.event_outlined,
-                  title: 'Banquet Halls',
-                  subtitle: 'Events & Celebrations',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const BanquetHallsScreen(),
-                      ),
-                    );
-                  },
-                ),
+    // =================================================
+    // 7. HEALTH CLUB
+    // =================================================
+    serviceCard(
+      icon: Icons.fitness_center_outlined,
+      title: 'Health Club',
+      subtitle: 'Fitness & Wellness',
+      onTap: () {
+        openPage('/health-club');
+      },
+    ),
 
-                // =================================================
-                // SPECIAL OFFERS - GROUP MEMBER
-                // =================================================
-                serviceCard(
-                  icon: Icons.local_offer_outlined,
-                  title: 'Special Offers',
-                  subtitle: 'Exclusive Deals',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SpecialOffersScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
+    // =================================================
+    // 8. OUR STORY
+    // =================================================
+    serviceCard(
+      icon: Icons.auto_stories_outlined,
+      title: 'Our Story',
+      subtitle: 'Discover Our Hotel',
+      onTap: () {
+        openPage('/our-story');
+      },
+    ),
+  ],
+),
 
             const SizedBox(height: 28),
 

@@ -7,110 +7,198 @@ class ManagerPaymentsScreen extends StatelessWidget {
   static const Color green = Color(0xFF3F4A32);
   static const Color background = Color(0xFFF5F0E8);
 
+  String formatDate(dynamic date) {
+    if (date is Timestamp) {
+      final DateTime d = date.toDate();
+      return '${d.day}/${d.month}/${d.year}';
+    }
+
+    if (date is DateTime) {
+      return '${date.day}/${date.month}/${date.year}';
+    }
+
+    return 'Not available';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: background,
-
       appBar: AppBar(
-        backgroundColor: green,
-        elevation: 0,
         title: const Text(
           'Payments',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 19,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-         iconTheme: const IconThemeData(
-          color: Color(0xFFF5F0E8),
-        ),
+        backgroundColor: green,
+        foregroundColor: Colors.white,
       ),
-
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('bookings')
-            .orderBy('createdAt', descending: true)
+            .collection('roomBookings')
             .snapshots(),
-
-        builder: (context, snapshot) {
-          // Loading
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: green,
-              ),
-            );
+        builder: (context, roomSnapshot) {
+          if (roomSnapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
           }
 
-          // Error
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text(
-                'Error loading payments.',
-                style: TextStyle(
-                  color: green,
-                  fontSize: 16,
-                ),
-              ),
-            );
-          }
-
-          // No payments
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          if (roomSnapshot.hasError) {
             return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(25),
-
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-
-                  children: [
-                    Icon(
-                      Icons.payment_outlined,
-                      size: 70,
-                      color: green.withValues(alpha: 0.7),
-                    ),
-
-                    const SizedBox(height: 15),
-
-                    const Text(
-                      'No Payments Available',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: green,
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    const Text(
-                      'Customer payments will appear here.',
-                      textAlign: TextAlign.center,
-
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              child: Text('Error: ${roomSnapshot.error}'),
             );
           }
 
-          final payments = snapshot.data!.docs;
+          return StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('hallBookings')
+                .snapshots(),
+            builder: (context, hallSnapshot) {
+              if (hallSnapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
+              if (hallSnapshot.hasError) {
+                return Center(
+                  child: Text('Error: ${hallSnapshot.error}'),
+                );
+              }
 
-            itemCount: payments.length,
+              final payments = [
+                ...roomSnapshot.data!.docs.map((doc) {
+                  return {
+                    ...(doc.data() as Map<String, dynamic>),
+                    '_type': 'Room',
+                  };
+                }),
+                ...hallSnapshot.data!.docs.map((doc) {
+                  return {
+                    ...(doc.data() as Map<String, dynamic>),
+                    '_type': 'Event',
+                  };
+                }),
+              ];
 
-            itemBuilder: (context, index) {
-              final payment =
-                  payments[index].data() as Map<String, dynamic>;
+              if (payments.isEmpty) {
+                return const Center(
+                  child: Text(
+                    'No payments found',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                );
+              }
 
-              return _paymentCard(payment);
+              payments.sort((a, b) {
+                final aTime = a['createdAt'];
+                final bTime = b['createdAt'];
+
+                if (aTime is Timestamp && bTime is Timestamp) {
+                  return bTime.compareTo(aTime);
+                }
+
+                return 0;
+              });
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: payments.length,
+                itemBuilder: (context, index) {
+                  final payment = payments[index];
+                  final bool isEvent = payment['_type'] == 'Event';
+
+                  final String name = isEvent
+                      ? payment['hallName']?.toString() ?? 'Hall'
+                      : payment['roomType']?.toString() ?? 'Room';
+
+                  final String paymentStatus =
+                      payment['paymentStatus']?.toString() ?? 'Pending';
+
+                  final String paymentMethod =
+                      payment['paymentMethod']?.toString() ?? 'Not Paid';
+
+                  final dynamic totalAmount = payment['totalAmount'];
+
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 15),
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                isEvent ? Icons.event : Icons.hotel,
+                                color: green,
+                                size: 30,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  name,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                paymentStatus,
+                                style: TextStyle(
+                                  color: paymentStatus.toLowerCase() == 'paid'
+                                      ? Colors.green
+                                      : Colors.orange,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 15),
+
+                          if (isEvent) ...[
+                            _infoRow(
+                              Icons.calendar_today,
+                              'Event Date',
+                              formatDate(payment['eventDate']),
+                            ),
+                            _infoRow(
+                              Icons.category,
+                              'Event Type',
+                              payment['eventType']?.toString() ?? '-',
+                            ),
+                          ] else ...[
+                            _infoRow(
+                              Icons.login,
+                              'Check-in',
+                              formatDate(payment['checkIn']),
+                            ),
+                            _infoRow(
+                              Icons.logout,
+                              'Check-out',
+                              formatDate(payment['checkOut']),
+                            ),
+                          ],
+
+                          _infoRow(
+                            Icons.payment,
+                            'Payment Method',
+                            paymentMethod,
+                          ),
+
+                          _infoRow(
+                            Icons.attach_money,
+                            'Total Amount',
+                            'Rs. ${totalAmount ?? 0}',
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
             },
           );
         },
@@ -118,215 +206,29 @@ class ManagerPaymentsScreen extends StatelessWidget {
     );
   }
 
-  // =========================================================
-  // PAYMENT CARD
-  // =========================================================
-String formatDate(dynamic date) {
-  if (date is Timestamp) {
-    final DateTime d = date.toDate();
-    return '${d.day}/${d.month}/${d.year}';
-  }
-
-  if (date is DateTime) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
-
-  if (date is String && date.isNotEmpty) {
-    return date;
-  }
-
-  return '-';
-}
-  Widget _paymentCard(Map<String, dynamic> payment) {
-    final String paymentStatus =
-        payment['paymentStatus'] ?? 'Pending';
-
-    final String paymentMethod =
-        payment['paymentMethod'] ?? 'Not specified';
-
-    final String roomType =
-        payment['roomType'] ?? 'Room';
-
-    final String checkIn = formatDate(payment['checkIn']);
-
-    final String checkOut = formatDate(payment['checkOut']);
-
-    final dynamic totalAmount =
-        payment['totalAmount'] ?? 0;
-
-    return Card(
-      color: Colors.white,
-      elevation: 2,
-
-      margin: const EdgeInsets.only(bottom: 14),
-
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-
-          children: [
-            // -------------------------------------------------
-            // ROOM + PAYMENT STATUS
-            // -------------------------------------------------
-
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    roomType,
-
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: green,
-                    ),
-                  ),
-                ),
-
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
-                  ),
-
-                  decoration: BoxDecoration(
-                    color: paymentStatus.toLowerCase() == 'paid'
-                        ? Colors.green.shade100
-                        : Colors.orange.shade100,
-
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-
-                  child: Text(
-                    paymentStatus,
-
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-
-                      color: paymentStatus.toLowerCase() == 'paid'
-                          ? Colors.green.shade700
-                          : Colors.orange.shade700,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 15),
-
-            // -------------------------------------------------
-            // PAYMENT METHOD
-            // -------------------------------------------------
-
-            _paymentInfo(
-              Icons.credit_card_outlined,
-              'Payment Method',
-              paymentMethod,
-            ),
-
-            // -------------------------------------------------
-            // CHECK IN
-            // -------------------------------------------------
-
-            _paymentInfo(
-              Icons.login,
-              'Check-in',
-              checkIn,
-            ),
-
-            // -------------------------------------------------
-            // CHECK OUT
-            // -------------------------------------------------
-
-            _paymentInfo(
-              Icons.logout,
-              'Check-out',
-              checkOut,
-            ),
-
-            const Divider(height: 20),
-
-            // -------------------------------------------------
-            // TOTAL
-            // -------------------------------------------------
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-              children: [
-                const Text(
-                  'Total Amount',
-
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
-                ),
-
-                Text(
-                  'Rs. $totalAmount',
-
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: green,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // =========================================================
-  // PAYMENT INFORMATION
-  // =========================================================
-
-  Widget _paymentInfo(
+  Widget _infoRow(
     IconData icon,
     String title,
     String value,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 9),
-
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
           Icon(
             icon,
-            size: 18,
+            size: 20,
             color: green,
           ),
-
           const SizedBox(width: 10),
-
           Text(
             '$title: ',
-
             style: const TextStyle(
-              fontSize: 13,
-              color: Colors.black54,
+              fontWeight: FontWeight.bold,
             ),
           ),
-
           Expanded(
-            child: Text(
-              value,
-
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            child: Text(value),
           ),
         ],
       ),

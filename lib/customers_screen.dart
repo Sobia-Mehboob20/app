@@ -32,7 +32,7 @@ class CustomersScreen extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('users')
-            .where('role', isEqualTo: 'Customer')
+            .where('role', isEqualTo: 'customer')
             .snapshots(),
 
         builder: (context, snapshot) {
